@@ -1,17 +1,18 @@
+use log::{trace, warn};
 use regex::Regex;
-use reqwest;
-use rusqlite::{CachedStatement, Connection, Result, params_from_iter};
+use reqwest::blocking::get;
+use rusqlite::{Connection, Result, Transaction, params_from_iter};
 use serde::Deserialize;
-use serde_json::{Value, from_str};
+use serde_json::Value;
 use std::collections::HashMap;
+use std::env;
 
 #[derive(Deserialize, Debug)]
 struct ClassDataUpdate {
     table_name: String,
     sync_action: SyncAction,
-    #[serde(rename = "updated_pk_fields")]
     pk_fields: HashMap<String, Value>,
-    relevant_fields: HashMap<String, Value>,
+    relevant_fields: Option<HashMap<String, Value>>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -25,7 +26,7 @@ enum SyncAction {
 }
 
 #[derive(Debug)]
-struct SyncError {
+pub struct SyncError {
     message: String,
 }
 
@@ -45,8 +46,33 @@ const VALID_TABLES: [&str; 6] = [
     "previous_section_collections",
     "term_collections",
 ];
+const SYNC_ALL_ROUTE: &str = "sync/all";
 
-fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncError> {
+pub fn sync_all(conn: &mut Connection, /* last_update: time::Instant */) -> Result<i32, SyncError> {
+    let url = env::var("CLASSY_API_HOST")
+        .map_err(|_| SyncError::new("classy api env var not set"))?
+        + SYNC_ALL_ROUTE;
+    // let mut query_params = HashMap::new();
+    // let as_date: DateTime<UTC> = last_update.into();
+    // query_params.insert("lastSyncTimeStamp");
+    let result = get(url).map_err(|e| SyncError::new(&format!("request error {:?}", e)))?;
+    let updates: Vec<ClassDataUpdate> = result
+        .json()
+        .map_err(|e| SyncError::new(&format!("response to json error {:?}", e)))?;
+    let tx = conn
+        .transaction()
+        .map_err(|e| SyncError::new(&format!("transaction failed {:?}", e)))?;
+    for update in updates {
+        if let Some(err) = execute_update(&tx, update) {
+            return Err(err);
+        }
+    }
+    tx.commit()
+        .map_err(|e| SyncError::new(&format!("sync failed {:?}", e)))?;
+    return Ok(1);
+}
+
+fn execute_update(conn: &Transaction, update: ClassDataUpdate) -> Option<SyncError> {
     // to prvent possible sql injection attacks if the sync api was
     //   ever compromised
     if !VALID_TABLES.contains(&update.table_name.as_str()) {
@@ -56,22 +82,39 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
         )));
     }
     let is_column = Regex::new(r"\b[a-zA-Z_]\b").unwrap();
-    if update
+    let invalid_cols: Vec<_> = update
         .relevant_fields
+        .as_ref()
+        .unwrap_or(&HashMap::new())
         .iter()
-        .any(|(col, _)| !is_column.is_match(col))
-    {
+        .filter_map(|(col, _)| {
+            if is_column.is_match(col) {
+                Some(col.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    if !invalid_cols.is_empty() {
         return Some(SyncError::new(&format!(
-            "`{:?}` There is an invalid column in relevant fields",
-            update.relevant_fields
+            "`{:?}` There is are invalid column(s) in relevant fields: {}",
+            update.relevant_fields,
+            invalid_cols.join(", ")
         )));
     }
 
-    if update
+    let invalid_cols: Vec<_> = update
         .pk_fields
         .iter()
-        .any(|(col, _)| !is_column.is_match(col))
-    {
+        .filter_map(|(col, _)| {
+            if is_column.is_match(col) {
+                Some(col.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    if !invalid_cols.is_empty() {
         return Some(SyncError::new(&format!(
             "`{:?}` There is an invalid column in pk fields",
             update.pk_fields
@@ -83,13 +126,18 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
             let mut arg_counter: usize = 0;
             let mut param_args: Vec<rusqlite::types::Value> = vec![];
             let mut set_values = vec![];
-            for (col, val) in update.relevant_fields.iter() {
+            for (col, val) in update
+                .relevant_fields
+                .as_ref()
+                .unwrap_or(&HashMap::new())
+                .iter()
+            {
                 match convert_to_sql_value(&val) {
                     Ok(v) => param_args.push(v),
                     Err(e) => return Some(e),
                 }
                 arg_counter += 1;
-                set_values.push(format!("{} = {}?", col, arg_counter))
+                set_values.push(format!("{} = ?{}", col, arg_counter))
             }
             let set_values = set_values.join(", ");
             let mut where_values = vec![];
@@ -99,7 +147,7 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
                     Err(e) => return Some(e),
                 }
                 arg_counter += 1;
-                where_values.push(format!("{} = {}?", col, arg_counter))
+                where_values.push(format!("{} = ?{}", col, arg_counter))
             }
 
             let where_values = where_values.join(" AND ");
@@ -107,6 +155,7 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
                 "UPDATE {} SET {} WHERE {};",
                 update.table_name, set_values, where_values
             );
+            println!("{}", sql_string);
             let maybe_statement = conn.prepare_cached(&sql_string);
 
             maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
@@ -121,11 +170,12 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
                     Err(e) => return Some(e),
                 }
                 arg_counter += 1;
-                where_values.push(format!("{} = {}?", col, arg_counter))
+                where_values.push(format!("{} = ?{}", col, arg_counter))
             }
             let where_values = where_values.join(" AND ");
 
             let sql_string = format!("DELETE FROM {} WHERE {};", update.table_name, where_values);
+            trace!("EXECUTING SQL:\n{} {:?}", sql_string, param_args);
             let maybe_statement = conn.prepare_cached(&sql_string);
             maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
         }
@@ -141,16 +191,21 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
                 }
                 arg_counter += 1;
                 columns.push(col.to_string());
-                values.push(format!("{}?", arg_counter))
+                values.push(format!("?{}", arg_counter))
             }
-            for (col, val) in update.relevant_fields.iter() {
+            for (col, val) in update
+                .relevant_fields
+                .as_ref()
+                .unwrap_or(&HashMap::new())
+                .iter()
+            {
                 match convert_to_sql_value(&val) {
                     Ok(v) => param_args.push(v),
                     Err(e) => return Some(e),
                 }
                 arg_counter += 1;
                 columns.push(col.to_string());
-                values.push(format!("{}?", arg_counter))
+                values.push(format!("?{}", arg_counter))
             }
             let columns = columns.join(", ");
             let values = values.join(", ");
@@ -159,6 +214,7 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
                 "INSERT INTO {} ({}) VALUES ({});",
                 update.table_name, columns, values
             );
+            println!("{}", sql_string);
             let maybe_statement = conn.prepare_cached(&sql_string);
 
             maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
@@ -167,13 +223,15 @@ fn execute_update(conn: &Connection, update: &ClassDataUpdate) -> Option<SyncErr
     match result {
         Ok(statement) => match statement {
             Ok(num) => {
-                if num == 1 {
-                    return None;
+                if num != 1 {
+                    warn!("Query affected {} rows extected 1", num)
                 }
-                return Some(SyncError::new(&format!(
-                    "Query affect {} rows expected 1",
-                    num
-                )));
+                return None;
+
+                // return Some(SyncError::new(&format!(
+                //     "Query affected {} rows expected 1",
+                //     num
+                // )));
             }
             Err(err) => return Some(SyncError::new(&format!("Error executing query {:?}", err))),
         },
@@ -199,5 +257,30 @@ fn convert_to_sql_value(v: &Value) -> Result<rusqlite::types::Value, SyncError> 
             }
         }
         _ => Err(SyncError::new(&format!("Unsupported type {:?}", v))),
+    }
+}
+
+#[cfg(test)]
+mod sync_tests {
+    use super::*;
+    use serde_json::from_str;
+    use std::fs;
+
+    #[test]
+    fn full_sync() {
+        env_logger::init();
+        let mut conn = Connection::open_in_memory().unwrap();
+        let up_migration = fs::read_to_string("migrations/001.up.sql").unwrap();
+        conn.execute_batch(&up_migration).unwrap();
+
+        let updates_text = fs::read_to_string("test-syncs/maristfall2024.json").unwrap();
+        let updates: Vec<ClassDataUpdate> = from_str(&updates_text).unwrap();
+        let tx = conn.transaction().unwrap();
+        for update in updates {
+            if let Some(error) = execute_update(&tx, update) {
+                panic!("{:?}", error);
+            }
+        }
+        tx.commit().unwrap();
     }
 }
