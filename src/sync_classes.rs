@@ -1,11 +1,29 @@
+use chrono::{DateTime, Utc};
 use log::{trace, warn};
 use regex::Regex;
 use reqwest::blocking::get;
 use rusqlite::{Connection, Result, Transaction, params_from_iter};
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
+
+#[derive(Deserialize, Debug)]
+struct SyncResponse {
+    sync_data: Vec<ClassDataUpdate>,
+    #[serde(deserialize_with = "deserialize_datetime_utc")]
+    last_update: DateTime<Utc>,
+}
+
+fn deserialize_datetime_utc<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: &str = Deserialize::deserialize(deserializer)?;
+    DateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S%.f%:z")
+        .map_err(serde::de::Error::custom)
+        .map(|dt| dt.with_timezone(&Utc))
+}
 
 #[derive(Deserialize, Debug)]
 struct ClassDataUpdate {
@@ -48,28 +66,51 @@ const VALID_TABLES: [&str; 6] = [
 ];
 const SYNC_ALL_ROUTE: &str = "sync/all";
 
-pub fn sync_all(conn: &mut Connection, /* last_update: time::Instant */) -> Result<i32, SyncError> {
+pub fn sync_all(
+    conn: &mut Connection,
+    maybe_last_update: Option<DateTime<Utc>>,
+) -> Result<DateTime<Utc>, SyncError> {
     let url = env::var("CLASSY_API_HOST")
         .map_err(|_| SyncError::new("classy api env var not set"))?
         + SYNC_ALL_ROUTE;
-    // let mut query_params = HashMap::new();
-    // let as_date: DateTime<UTC> = last_update.into();
-    // query_params.insert("lastSyncTimeStamp");
+    let last_update = match maybe_last_update {
+        Some(u) => u,
+        None => {
+            let timestamp: String = conn
+                .query_row(
+                    r#" SELECT COALESCE(
+                            MAX(time_of_collection),
+                            '1970-01-01 00:00:00'
+                        ) FROM previous_collections;
+                    "#,
+                    (),
+                    |row| row.get(0),
+                )
+                .map_err(|e| {
+                    SyncError::new(&format!("could not get last collection time {}", e))
+                })?;
+            DateTime::parse_from_rfc3339(&timestamp)
+                .map_err(|e| SyncError::new(&format!("could not parse date time {}", e)))?
+                .with_timezone(&Utc)
+        }
+    };
+    let mut query_params = HashMap::new();
+    query_params.insert("lastSyncTimeStamp", last_update.to_rfc3339());
     let result = get(url).map_err(|e| SyncError::new(&format!("request error {:?}", e)))?;
-    let updates: Vec<ClassDataUpdate> = result
+    let response: SyncResponse = result
         .json()
         .map_err(|e| SyncError::new(&format!("response to json error {:?}", e)))?;
     let tx = conn
         .transaction()
         .map_err(|e| SyncError::new(&format!("transaction failed {:?}", e)))?;
-    for update in updates {
+    for update in response.sync_data {
         if let Some(err) = execute_update(&tx, update) {
             return Err(err);
         }
     }
     tx.commit()
         .map_err(|e| SyncError::new(&format!("sync failed {:?}", e)))?;
-    return Ok(1);
+    return Ok(response.last_update);
 }
 
 fn execute_update(conn: &Transaction, update: ClassDataUpdate) -> Option<SyncError> {
@@ -274,9 +315,9 @@ mod sync_tests {
         conn.execute_batch(&up_migration).unwrap();
 
         let updates_text = fs::read_to_string("test-syncs/maristfall2024.json").unwrap();
-        let updates: Vec<ClassDataUpdate> = from_str(&updates_text).unwrap();
+        let response: SyncResponse = from_str(&updates_text).unwrap();
         let tx = conn.transaction().unwrap();
-        for update in updates {
+        for update in response.sync_data {
             if let Some(error) = execute_update(&tx, update) {
                 panic!("{:?}", error);
             }
