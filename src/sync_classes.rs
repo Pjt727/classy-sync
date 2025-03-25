@@ -8,6 +8,18 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
 
+const VALID_TABLES: [&str; 6] = [
+    "meeting_times",
+    "sections",
+    "professors",
+    "courses",
+    "previous_section_collections",
+    "term_collections",
+];
+
+const SYNC_ALL_ROUTE: &str = "sync/all/school";
+const SYNC_TERM_ROUTE: &str = "sync/select/";
+
 #[derive(Deserialize, Debug)]
 struct SyncResponse {
     sync_data: Vec<ClassDataUpdate>,
@@ -56,16 +68,6 @@ impl SyncError {
     }
 }
 
-const VALID_TABLES: [&str; 6] = [
-    "meeting_times",
-    "sections",
-    "professors",
-    "courses",
-    "previous_section_collections",
-    "term_collections",
-];
-const SYNC_ALL_ROUTE: &str = "sync/all";
-
 pub fn sync_all(
     conn: &mut Connection,
     maybe_last_update: Option<DateTime<Utc>>,
@@ -79,9 +81,56 @@ pub fn sync_all(
             let timestamp: String = conn
                 .query_row(
                     r#" SELECT COALESCE(
-                            MAX(time_of_collection),
+                            MAX(synced_at),
                             '1970-01-01 00:00:00'
-                        ) FROM previous_collections;
+                        ) FROM previous_all_collections;
+                    "#,
+                    (),
+                    |row| row.get(0),
+                )
+                .map_err(|e| {
+                    SyncError::new(&format!("could not get last collection time {}", e))
+                })?;
+            DateTime::parse_from_rfc3339(&timestamp)
+                .map_err(|e| SyncError::new(&format!("could not parse date time {}", e)))?
+                .with_timezone(&Utc)
+        }
+    };
+    let mut query_params = HashMap::new();
+    query_params.insert("lastSyncTimeStamp", last_update.to_rfc3339());
+    let result = get(url).map_err(|e| SyncError::new(&format!("request error {:?}", e)))?;
+    let response: SyncResponse = result
+        .json()
+        .map_err(|e| SyncError::new(&format!("response to json error {:?}", e)))?;
+    let tx = conn
+        .transaction()
+        .map_err(|e| SyncError::new(&format!("transaction failed {:?}", e)))?;
+    for update in response.sync_data {
+        if let Some(err) = execute_update(&tx, update) {
+            return Err(err);
+        }
+    }
+    tx.commit()
+        .map_err(|e| SyncError::new(&format!("sync failed {:?}", e)))?;
+    return Ok(response.last_update);
+}
+
+pub fn sync_select(
+    conn: &mut Connection,
+    maybe_last_update: Option<DateTime<Utc>>,
+) -> Result<DateTime<Utc>, SyncError> {
+    let url = env::var("CLASSY_API_HOST")
+        .map_err(|_| SyncError::new("classy api env var not set"))?
+        + SYNC_ALL_ROUTE;
+    let last_update = match maybe_last_update {
+        Some(u) => u,
+        None => {
+            let timestamp: String = conn
+                .query_row(
+                    r#" SELECT COALESCE(
+                            MAX(synced_at),
+                            '1970-01-01 00:00:00'
+                        ) FROM previous_all_collections;
                     "#,
                     (),
                     |row| row.get(0),

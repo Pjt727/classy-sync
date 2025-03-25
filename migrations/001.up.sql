@@ -1,14 +1,11 @@
+-- The reason we cannot sync non section/meeting data with the most recent term collection
+--     is because if there were two term collections with overlapping syncs then we would not
+--     know which non section/meeting data to sync 
+-- 
 BEGIN;
 CREATE TABLE schools (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL
-);
-
-CREATE TABLE terms (
-    year INT,
-    season TEXT,
-
-    PRIMARY KEY (year, season)
 );
 
 CREATE TABLE term_collections (
@@ -20,14 +17,23 @@ CREATE TABLE term_collections (
     name TEXT,
     still_collecting BOOL NOT NULL,
     FOREIGN KEY (school_id) REFERENCES schools(id),
-    FOREIGN KEY (year, season) REFERENCES terms(year, season),
     PRIMARY KEY (id, school_id)
 );
 
-CREATE TABLE previous_collections (
-    time_of_collection TIMESTAMP WITH TIME ZONE PRIMARY KEY,
-    was_success BOOL NOT NULL
+CREATE TABLE previous_all_collections (
+    sequence INT,
+    synced_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE previous_term_collections (
+    common_sequence INT NOT NULL,
+    term_sequence INT,
+    school_id TEXT,
+    term_collection_id TEXT,
+    synced_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 
 CREATE TABLE professors (
     id TEXT,
