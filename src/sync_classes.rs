@@ -3,9 +3,9 @@ use log::{trace, warn};
 use regex::Regex;
 use reqwest::blocking::get;
 use rusqlite::{Connection, Result, Transaction, params_from_iter};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 
 const VALID_TABLES: [&str; 6] = [
@@ -17,8 +17,8 @@ const VALID_TABLES: [&str; 6] = [
     "term_collections",
 ];
 
-const SYNC_ALL_ROUTE: &str = "sync/all/school";
-const SYNC_TERM_ROUTE: &str = "sync/select/";
+const SYNC_ALL_ROUTE: &str = "sync/all";
+const SYNC_TERM_ROUTE: &str = "sync/select";
 
 #[derive(Deserialize, Debug)]
 struct SyncResponse {
@@ -68,36 +68,23 @@ impl SyncError {
     }
 }
 
-pub fn sync_all(
-    conn: &mut Connection,
-    maybe_last_update: Option<DateTime<Utc>>,
-) -> Result<DateTime<Utc>, SyncError> {
+pub fn sync_all(conn: &mut Connection) -> Result<String, SyncError> {
     let url = env::var("CLASSY_API_HOST")
         .map_err(|_| SyncError::new("classy api env var not set"))?
         + SYNC_ALL_ROUTE;
-    let last_update = match maybe_last_update {
-        Some(u) => u,
-        None => {
-            let timestamp: String = conn
-                .query_row(
-                    r#" SELECT COALESCE(
+    let last_sync: i32 = conn
+        .query_row(
+            r#" SELECT COALESCE(
                             MAX(synced_at),
                             '1970-01-01 00:00:00'
                         ) FROM previous_all_collections;
                     "#,
-                    (),
-                    |row| row.get(0),
-                )
-                .map_err(|e| {
-                    SyncError::new(&format!("could not get last collection time {}", e))
-                })?;
-            DateTime::parse_from_rfc3339(&timestamp)
-                .map_err(|e| SyncError::new(&format!("could not parse date time {}", e)))?
-                .with_timezone(&Utc)
-        }
-    };
+            (),
+            |row| row.get(0),
+        )
+        .map_err(|e| SyncError::new(&format!("could not get last collection time {}", e)))?;
     let mut query_params = HashMap::new();
-    query_params.insert("lastSyncTimeStamp", last_update.to_rfc3339());
+    query_params.insert("lastSyncTimeStamp", last_sync);
     let result = get(url).map_err(|e| SyncError::new(&format!("request error {:?}", e)))?;
     let response: SyncResponse = result
         .json()
@@ -115,9 +102,115 @@ pub fn sync_all(
     return Ok(response.last_update);
 }
 
+#[derive(Serialize, Deserialize)]
+struct PerTerm {
+    school_id: String,
+    term_collection_id: String,
+    last_sequence: i32,
+}
+
+#[derive(Serialize, Deserialize)]
+struct PerSchool {
+    school_id: String,
+    last_sequence: i32,
+}
+
+#[derive(Serialize, Deserialize)]
+struct SyncDataPerTermParams {
+    term_sequences: Vec<PerTerm>,
+    school_sequences: Vec<PerSchool>,
+}
+
+// previous_term_collections
+//
+pub fn create_sync_params<S, T>(
+    conn: &mut Connection,
+    schools: S,
+    terms: T,
+) -> Result<SyncDataPerTermParams, SyncError>
+where
+    S: Iterator<Item = String>,
+    T: Iterator<Item = (String, String)>,
+{
+    let mut params = SyncDataPerTermParams {
+        term_sequences: vec![],
+        school_sequences: vec![],
+    };
+    for school_id in schools {
+        let last_sequence: i32 = conn
+            .query_row(
+                r#" SELECT COALESCE(
+                            MAX(common_sequence),
+                            0
+                    ) 
+                    FROM previous_term_collections
+                    WHERE school_id = ?1
+                    ;
+                    "#,
+                (&school_id,),
+                |row| row.get(0),
+            )
+            .map_err(|e| SyncError::new(&format!("could not get last collection time {}", e)))?;
+        params.school_sequences.push(PerSchool {
+            school_id,
+            last_sequence,
+        })
+    }
+    Ok(params)
+}
+
+pub struct SelectSyncOptions {
+    schools: HashSet<String>,
+    terms: HashMap<String, HashSet<String>>,
+}
+
+impl SelectSyncOptions {
+    pub fn new() -> SelectSyncOptions {
+        return SelectSyncOptions {
+            schools: HashSet::new(),
+            terms: HashMap::new(),
+        };
+    }
+
+    pub fn add_school(&mut self, school_id: &str) {
+        if self.terms.contains_key(school_id) {
+            warn!(
+                "School {} already added from a term sync - the common sync will be ignored",
+                school_id
+            )
+        }
+        let did_add = self.schools.insert(school_id.to_owned());
+        if did_add {
+            warn!("School {} already added", school_id)
+        }
+    }
+
+    pub fn add_term(&mut self, school_id: &str, term_id: &str) {
+        if self.schools.contains(school_id) {
+            warn!(
+                "School {} already added as a common sync - the common sync will be ignored",
+                school_id
+            );
+            self.schools.remove(school_id);
+        }
+        let did_exist = self
+            .terms
+            .entry(school_id.to_string())
+            .or_insert(HashSet::new())
+            .insert(term_id.to_string());
+        if did_exist {
+            warn!(
+                "Term {},{} was already added - ignoring duplicate",
+                school_id, term_id
+            );
+        }
+    }
+}
+
 pub fn sync_select(
     conn: &mut Connection,
-    maybe_last_update: Option<DateTime<Utc>>,
+    common_only_syncs: Vec<String>,
+    term_syncs: Vec<Term>,
 ) -> Result<DateTime<Utc>, SyncError> {
     let url = env::var("CLASSY_API_HOST")
         .map_err(|_| SyncError::new("classy api env var not set"))?
@@ -371,6 +464,15 @@ mod sync_tests {
                 panic!("{:?}", error);
             }
         }
+
+        if env::var("SAVE_DB").is_ok() {
+            conn.backup(rusqlite::backup::Backup::new(
+                conn.clone(),
+                rusqlite::Connection::open("test.db").unwrap(),
+            ))
+            .unwrap();
+        }
+
         tx.commit().unwrap();
     }
 }
