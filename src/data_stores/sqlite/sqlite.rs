@@ -36,7 +36,6 @@ impl Sqlite {
                 fs::read_to_string("src/data_stores/sqlite/migrations/001.up.sql").unwrap();
             let conn = Connection::open(file_path)?;
             conn.execute_batch(&up_migration)?;
-            println!("File created: {:?}", file_path);
             Ok(conn)
         } else {
             // TODO: check to see if the migrations are up to date
@@ -49,6 +48,12 @@ impl Sqlite {
         sync.verify_columns()?;
         let result = match sync.sync_action {
             SyncAction::Update => {
+                if sync.relevant_fields.is_none()
+                    || sync.relevant_fields.as_ref().unwrap().len() == 0
+                {
+                    warn!("Update sync with no changes: `{:?}`", sync);
+                    return Ok(());
+                }
                 let mut arg_counter: usize = 0;
                 let mut param_args: Vec<rusqlite::types::Value> = vec![];
                 let mut set_values = vec![];
@@ -81,7 +86,6 @@ impl Sqlite {
                     "UPDATE {} SET {} WHERE {};",
                     sync.table_name, set_values, where_values
                 );
-                println!("{}", sql_string);
                 let maybe_statement = conn.prepare_cached(&sql_string);
 
                 maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
@@ -101,7 +105,6 @@ impl Sqlite {
                 let where_values = where_values.join(" AND ");
 
                 let sql_string = format!("DELETE FROM {} WHERE {};", sync.table_name, where_values);
-                trace!("EXECUTING SQL:\n{} {:?}", sql_string, param_args);
                 let maybe_statement = conn.prepare_cached(&sql_string);
                 maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
             }
@@ -140,7 +143,6 @@ impl Sqlite {
                     "INSERT INTO {} ({}) VALUES ({});",
                     sync.table_name, columns, values
                 );
-                println!("{}", sql_string);
                 let maybe_statement = conn.prepare_cached(&sql_string);
 
                 maybe_statement.map(|mut s| s.execute(params_from_iter(param_args)))
@@ -232,6 +234,7 @@ fn convert_to_sql_value(v: &Value) -> Result<rusqlite::types::Value, Error> {
 mod sync_tests {
     use super::*;
     use dotenv::dotenv;
+    use log::info;
     use serde_json::from_str;
     use std::fs;
 
@@ -249,16 +252,36 @@ mod sync_tests {
             conn = Connection::open_in_memory().unwrap();
         }
 
-        let up_migration =
-            fs::read_to_string("src/data_stores/sqlite/migrations/001.up.sql").unwrap();
-        conn.execute_batch(&up_migration).unwrap();
-
-        let updates_text = fs::read_to_string("test-syncs/maristfall2024.json").unwrap();
-        let response: AllSyncResult = from_str(&updates_text).unwrap();
-        let tx = conn.transaction().unwrap();
-        for update in response.data {
-            Sqlite::execute_sync(&tx, update).unwrap()
+        let directory_of_test_syncs = "test-syncs/maristfall2024";
+        let mut stored_syncs = Vec::new();
+        for entry in fs::read_dir(directory_of_test_syncs).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(extension) = path.extension() {
+                    if extension != "json" {
+                        continue;
+                    }
+                    if let Some(file_name) = path.file_name() {
+                        if let Some(file_name_str) = file_name.to_str() {
+                            stored_syncs
+                                .push(directory_of_test_syncs.to_string() + "/" + file_name_str);
+                        }
+                    }
+                }
+            }
         }
-        tx.commit().unwrap();
+
+        for test_sync in stored_syncs {
+            info!("Starting sync: {}", test_sync);
+            let tx = conn.transaction().unwrap();
+            let updates_text = fs::read_to_string(&test_sync).unwrap();
+            let response: AllSyncResult = from_str(&updates_text).unwrap();
+            for update in response.data {
+                Sqlite::execute_sync(&tx, update).unwrap()
+            }
+            tx.commit().unwrap();
+            info!("Finished sync: {}", test_sync);
+        }
     }
 }

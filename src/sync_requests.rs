@@ -17,6 +17,8 @@ pub enum SyncAction {
 #[derive(Serialize, Display, Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TableName {
+    #[strum(serialize = "meeting_times")]
+    MeetingTimes,
     #[strum(serialize = "sections")]
     Sections,
     #[strum(serialize = "professors")]
@@ -25,6 +27,8 @@ pub enum TableName {
     Courses,
     #[strum(serialize = "term_collections")]
     TermCollections,
+    #[strum(serialize = "schools")]
+    Schools,
 }
 
 #[derive(Serialize, Display, Debug, Deserialize)]
