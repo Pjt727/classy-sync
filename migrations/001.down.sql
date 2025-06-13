@@ -1,8 +1,0 @@
-DROP TABLE IF EXISTS previous_collections;
-DROP TABLE IF EXISTS meeting_times;
-DROP TABLE IF EXISTS sections;
-DROP TABLE IF EXISTS professors;
-DROP TABLE IF EXISTS courses;
-DROP TABLE IF EXISTS term_collections;
-DROP TABLE IF EXISTS schools;
-DROP TABLE IF EXISTS terms;
