@@ -12,7 +12,7 @@ use std::path::Path;
 use std::result::Result;
 use std::{env, fs};
 
-struct Sqlite {
+pub struct Sqlite {
     conn: Connection,
 }
 
