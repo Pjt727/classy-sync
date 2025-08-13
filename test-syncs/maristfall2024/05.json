@@ -1,1 +1,1700 @@
-{"data":[{"sequence":8219,"table_name":"courses","pk_fields":{"number":"396N","school_id":"marist","subject_code":"HIST"},"sync_action":"insert","relevant_fields":{"credit_hours":6,"description":null,"subject_description":"History","title":"HIST INTERN I"}},{"sequence":8220,"table_name":"courses","pk_fields":{"number":"292L","school_id":"marist","subject_code":"SPAN"},"sync_action":"insert","relevant_fields":{"credit_hours":3,"description":null,"subject_description":"Spanish","title":"ST:SPAN HUM SRV"}},{"sequence":8326,"table_name":"meeting_times","pk_fields":{"course_number":"292L","school_id":"marist","section_sequence":"111","sequence":1,"subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"end_date":"2024-12-13T00:00:00","end_minutes":"16:45:00","is_friday":true,"is_monday":false,"is_saturday":false,"is_sunday":false,"is_thursday":false,"is_tuesday":false,"is_wednesday":false,"meeting_type":"LEC","start_date":"2024-08-26T00:00:00","start_minutes":"15:30:00"}},{"sequence":8222,"table_name":"meeting_times","pk_fields":{"course_number":"293L","school_id":"marist","section_sequence":"111","sequence":1,"subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"delete","relevant_fields":null},{"sequence":8323,"table_name":"meeting_times","pk_fields":{"course_number":"120L","school_id":"marist","section_sequence":"105","sequence":0,"subject_code":"ENG","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"end_date":"2024-12-13T00:00:00","end_minutes":"15:15:00","is_friday":false,"is_monday":true,"is_saturday":false,"is_sunday":false,"is_thursday":true,"is_tuesday":false,"is_wednesday":false,"meeting_type":"LEC","start_date":"2024-08-26T00:00:00","start_minutes":"14:00:00"}},{"sequence":8325,"table_name":"meeting_times","pk_fields":{"course_number":"292L","school_id":"marist","section_sequence":"111","sequence":0,"subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"end_date":"2024-12-13T00:00:00","end_minutes":"15:15:00","is_friday":false,"is_monday":false,"is_saturday":false,"is_sunday":false,"is_thursday":false,"is_tuesday":false,"is_wednesday":true,"meeting_type":"LEC","start_date":"2024-08-26T00:00:00","start_minutes":"14:00:00"}},{"sequence":8324,"table_name":"meeting_times","pk_fields":{"course_number":"396N","school_id":"marist","section_sequence":"111","sequence":0,"subject_code":"HIST","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"end_date":"2024-12-13T00:00:00","end_minutes":null,"is_friday":false,"is_monday":false,"is_saturday":false,"is_sunday":false,"is_thursday":false,"is_tuesday":false,"is_wednesday":false,"meeting_type":"LEC","start_date":"2024-08-26T00:00:00","start_minutes":null}},{"sequence":8221,"table_name":"meeting_times","pk_fields":{"course_number":"293L","school_id":"marist","section_sequence":"111","sequence":0,"subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"delete","relevant_fields":null},{"sequence":8250,"table_name":"sections","pk_fields":{"course_number":"317L","school_id":"marist","sequence":"111","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8264,"table_name":"sections","pk_fields":{"course_number":"239N","school_id":"marist","sequence":"111","subject_code":"MUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8301,"table_name":"sections","pk_fields":{"course_number":"390L","school_id":"marist","sequence":"200","subject_code":"CRJU","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":17}},{"sequence":8241,"table_name":"sections","pk_fields":{"course_number":"365L","school_id":"marist","sequence":"111","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8288,"table_name":"sections","pk_fields":{"course_number":"201L","school_id":"marist","sequence":"113","subject_code":"BIOL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":21}},{"sequence":8223,"table_name":"sections","pk_fields":{"course_number":"120L","school_id":"marist","sequence":"105","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"campus":"Marist College Campus","enrollment":0,"instruction_method":"","max_enrollment":3,"primary_professor_id":null}},{"sequence":8269,"table_name":"sections","pk_fields":{"course_number":"210L","school_id":"marist","sequence":"111","subject_code":"PSYC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":10}},{"sequence":8262,"table_name":"sections","pk_fields":{"course_number":"236N","school_id":"marist","sequence":"111","subject_code":"MUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8285,"table_name":"sections","pk_fields":{"course_number":"241L","school_id":"marist","sequence":"112","subject_code":"MATH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8309,"table_name":"sections","pk_fields":{"course_number":"705L","school_id":"marist","sequence":"256","subject_code":"PSYH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8255,"table_name":"sections","pk_fields":{"course_number":"400N","school_id":"marist","sequence":"111","subject_code":"FASH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":9}},{"sequence":8259,"table_name":"sections","pk_fields":{"course_number":"391L","school_id":"marist","sequence":"111","subject_code":"HONR","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8281,"table_name":"sections","pk_fields":{"course_number":"475N","school_id":"marist","sequence":"112","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":10}},{"sequence":8305,"table_name":"sections","pk_fields":{"course_number":"313N","school_id":"marist","sequence":"200","subject_code":"PRLG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":19}},{"sequence":8313,"table_name":"sections","pk_fields":{"course_number":"212L","school_id":"marist","sequence":"721","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8225,"table_name":"sections","pk_fields":{"course_number":"101L","school_id":"marist","sequence":"111","subject_code":"ART","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"max_enrollment":0}},{"sequence":8289,"table_name":"sections","pk_fields":{"course_number":"215L","school_id":"marist","sequence":"113","subject_code":"CHEM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8246,"table_name":"sections","pk_fields":{"course_number":"403L","school_id":"marist","sequence":"111","subject_code":"ECON","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"max_enrollment":20}},{"sequence":8277,"table_name":"sections","pk_fields":{"course_number":"211L","school_id":"marist","sequence":"112","subject_code":"CHEM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8315,"table_name":"sections","pk_fields":{"course_number":"371L","school_id":"marist","sequence":"721","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8231,"table_name":"sections","pk_fields":{"course_number":"420N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":24}},{"sequence":8297,"table_name":"sections","pk_fields":{"course_number":"130L","school_id":"marist","sequence":"116","subject_code":"BIOL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"max_enrollment":0}},{"sequence":8275,"table_name":"sections","pk_fields":{"course_number":"320L","school_id":"marist","sequence":"112","subject_code":"BIOL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":22}},{"sequence":8230,"table_name":"sections","pk_fields":{"course_number":"382N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":18}},{"sequence":8266,"table_name":"sections","pk_fields":{"course_number":"194N","school_id":"marist","sequence":"111","subject_code":"PHED","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":16}},{"sequence":8267,"table_name":"sections","pk_fields":{"course_number":"290L","school_id":"marist","sequence":"111","subject_code":"POSC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8258,"table_name":"sections","pk_fields":{"course_number":"390L","school_id":"marist","sequence":"111","subject_code":"HONR","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8291,"table_name":"sections","pk_fields":{"course_number":"226L","school_id":"marist","sequence":"113","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":2}},{"sequence":8317,"table_name":"sections","pk_fields":{"course_number":"306L","school_id":"marist","sequence":"721","subject_code":"FASH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":12}},{"sequence":8229,"table_name":"sections","pk_fields":{"course_number":"320N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8292,"table_name":"sections","pk_fields":{"course_number":"388N","school_id":"marist","sequence":"114","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":14}},{"sequence":8280,"table_name":"sections","pk_fields":{"course_number":"416N","school_id":"marist","sequence":"112","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8276,"table_name":"sections","pk_fields":{"course_number":"201L","school_id":"marist","sequence":"112","subject_code":"CHEM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8226,"table_name":"sections","pk_fields":{"course_number":"320L","school_id":"marist","sequence":"111","subject_code":"BIOL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":5}},{"sequence":8303,"table_name":"sections","pk_fields":{"course_number":"346L","school_id":"marist","sequence":"200","subject_code":"PHIL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8270,"table_name":"sections","pk_fields":{"course_number":"323L","school_id":"marist","sequence":"111","subject_code":"PSYC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8319,"table_name":"sections","pk_fields":{"course_number":"242L","school_id":"marist","sequence":"722","subject_code":"MUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":16}},{"sequence":8251,"table_name":"sections","pk_fields":{"course_number":"380L","school_id":"marist","sequence":"111","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":9}},{"sequence":8239,"table_name":"sections","pk_fields":{"course_number":"242L","school_id":"marist","sequence":"111","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8307,"table_name":"sections","pk_fields":{"course_number":"610N","school_id":"marist","sequence":"256","subject_code":"PSYH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8283,"table_name":"sections","pk_fields":{"course_number":"273L","school_id":"marist","sequence":"112","subject_code":"HIST","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8322,"table_name":"sections","pk_fields":{"course_number":"401L","school_id":"marist","sequence":"801","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8256,"table_name":"sections","pk_fields":{"course_number":"401N","school_id":"marist","sequence":"111","subject_code":"GAME","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":18}},{"sequence":8299,"table_name":"sections","pk_fields":{"course_number":"110N","school_id":"marist","sequence":"200","subject_code":"ART","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8316,"table_name":"sections","pk_fields":{"course_number":"220L","school_id":"marist","sequence":"721","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":16}},{"sequence":8320,"table_name":"sections","pk_fields":{"course_number":"300L","school_id":"marist","sequence":"723","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":5}},{"sequence":8235,"table_name":"sections","pk_fields":{"course_number":"421N","school_id":"marist","sequence":"111","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":28}},{"sequence":8290,"table_name":"sections","pk_fields":{"course_number":"104L","school_id":"marist","sequence":"113","subject_code":"ECON","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8314,"table_name":"sections","pk_fields":{"course_number":"325L","school_id":"marist","sequence":"721","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":14}},{"sequence":8242,"table_name":"sections","pk_fields":{"course_number":"424L","school_id":"marist","sequence":"111","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":17}},{"sequence":8254,"table_name":"sections","pk_fields":{"course_number":"355N","school_id":"marist","sequence":"111","subject_code":"FASH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8286,"table_name":"sections","pk_fields":{"course_number":"120L","school_id":"marist","sequence":"112","subject_code":"MDIA","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8244,"table_name":"sections","pk_fields":{"course_number":"314L","school_id":"marist","sequence":"111","subject_code":"CRJU","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":11}},{"sequence":8248,"table_name":"sections","pk_fields":{"course_number":"205L","school_id":"marist","sequence":"111","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":2}},{"sequence":8312,"table_name":"sections","pk_fields":{"course_number":"103L","school_id":"marist","sequence":"721","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8228,"table_name":"sections","pk_fields":{"course_number":"310L","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8278,"table_name":"sections","pk_fields":{"course_number":"307N","school_id":"marist","sequence":"112","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":1}},{"sequence":8252,"table_name":"sections","pk_fields":{"course_number":"300N","school_id":"marist","sequence":"111","subject_code":"FASH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8318,"table_name":"sections","pk_fields":{"course_number":"323L","school_id":"marist","sequence":"721","subject_code":"PSYC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":22}},{"sequence":8282,"table_name":"sections","pk_fields":{"course_number":"360L","school_id":"marist","sequence":"112","subject_code":"ENSC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8294,"table_name":"sections","pk_fields":{"course_number":"340N","school_id":"marist","sequence":"115","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8234,"table_name":"sections","pk_fields":{"course_number":"215L","school_id":"marist","sequence":"111","subject_code":"CHEM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8268,"table_name":"sections","pk_fields":{"course_number":"202L","school_id":"marist","sequence":"111","subject_code":"PSYC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8232,"table_name":"sections","pk_fields":{"course_number":"450N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":11}},{"sequence":8274,"table_name":"sections","pk_fields":{"course_number":"110N","school_id":"marist","sequence":"112","subject_code":"ART","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"max_enrollment":1}},{"sequence":8296,"table_name":"sections","pk_fields":{"course_number":"241L","school_id":"marist","sequence":"115","subject_code":"MATH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":1}},{"sequence":8257,"table_name":"sections","pk_fields":{"course_number":"396N","school_id":"marist","sequence":"111","subject_code":"HIST","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"campus":"Marist College Campus","enrollment":0,"instruction_method":"","max_enrollment":0,"primary_professor_id":"Steven.Garabedian@marist.edu"}},{"sequence":8240,"table_name":"sections","pk_fields":{"course_number":"329L","school_id":"marist","sequence":"111","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":9}},{"sequence":8321,"table_name":"sections","pk_fields":{"course_number":"401L","school_id":"marist","sequence":"800","subject_code":"COM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":24}},{"sequence":8243,"table_name":"sections","pk_fields":{"course_number":"202L","school_id":"marist","sequence":"111","subject_code":"CRJU","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8304,"table_name":"sections","pk_fields":{"course_number":"210N","school_id":"marist","sequence":"200","subject_code":"PRLG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8233,"table_name":"sections","pk_fields":{"course_number":"477N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":12}},{"sequence":8227,"table_name":"sections","pk_fields":{"course_number":"301N","school_id":"marist","sequence":"111","subject_code":"BUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":5}},{"sequence":8302,"table_name":"sections","pk_fields":{"course_number":"225L","school_id":"marist","sequence":"200","subject_code":"HLTH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":13}},{"sequence":8271,"table_name":"sections","pk_fields":{"course_number":"292L","school_id":"marist","sequence":"111","subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"insert","relevant_fields":{"campus":"Marist College Campus","enrollment":0,"instruction_method":"","max_enrollment":20,"primary_professor_id":"Patricia.Macera@marist.edu"}},{"sequence":8247,"table_name":"sections","pk_fields":{"course_number":"150L","school_id":"marist","sequence":"111","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":2}},{"sequence":8284,"table_name":"sections","pk_fields":{"course_number":"205L","school_id":"marist","sequence":"112","subject_code":"MATH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8263,"table_name":"sections","pk_fields":{"course_number":"237N","school_id":"marist","sequence":"111","subject_code":"MUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":3}},{"sequence":8273,"table_name":"sections","pk_fields":{"course_number":"403N","school_id":"marist","sequence":"112","subject_code":"ACCT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":23}},{"sequence":8293,"table_name":"sections","pk_fields":{"course_number":"101L","school_id":"marist","sequence":"114","subject_code":"SOC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8245,"table_name":"sections","pk_fields":{"course_number":"374L","school_id":"marist","sequence":"111","subject_code":"CRJU","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8295,"table_name":"sections","pk_fields":{"course_number":"215L","school_id":"marist","sequence":"115","subject_code":"CHEM","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":2}},{"sequence":8300,"table_name":"sections","pk_fields":{"course_number":"206N","school_id":"marist","sequence":"200","subject_code":"CRJU","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":14}},{"sequence":8308,"table_name":"sections","pk_fields":{"course_number":"618L","school_id":"marist","sequence":"256","subject_code":"PSYH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":8}},{"sequence":8310,"table_name":"sections","pk_fields":{"course_number":"710N","school_id":"marist","sequence":"256","subject_code":"PSYH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8253,"table_name":"sections","pk_fields":{"course_number":"304N","school_id":"marist","sequence":"111","subject_code":"FASH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8272,"table_name":"sections","pk_fields":{"course_number":"293L","school_id":"marist","sequence":"111","subject_code":"SPAN","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":0,"max_enrollment":0,"primary_professor_id":null}},{"sequence":8238,"table_name":"sections","pk_fields":{"course_number":"479N","school_id":"marist","sequence":"111","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":33}},{"sequence":8265,"table_name":"sections","pk_fields":{"course_number":"127N","school_id":"marist","sequence":"111","subject_code":"PHED","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":9}},{"sequence":8260,"table_name":"sections","pk_fields":{"course_number":"343L","school_id":"marist","sequence":"111","subject_code":"MATH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":9}},{"sequence":8249,"table_name":"sections","pk_fields":{"course_number":"234L","school_id":"marist","sequence":"111","subject_code":"ENG","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8261,"table_name":"sections","pk_fields":{"course_number":"106L","school_id":"marist","sequence":"111","subject_code":"MUS","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8224,"table_name":"sections","pk_fields":{"course_number":"330N","school_id":"marist","sequence":"111","subject_code":"ACCT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"max_enrollment":25}},{"sequence":8306,"table_name":"sections","pk_fields":{"course_number":"602L","school_id":"marist","sequence":"232","subject_code":"PSYH","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":7}},{"sequence":8311,"table_name":"sections","pk_fields":{"course_number":"419N","school_id":"marist","sequence":"721","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":10}},{"sequence":8298,"table_name":"sections","pk_fields":{"course_number":"101L","school_id":"marist","sequence":"142","subject_code":"PHIL","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":1}},{"sequence":8279,"table_name":"sections","pk_fields":{"course_number":"308N","school_id":"marist","sequence":"112","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":4}},{"sequence":8236,"table_name":"sections","pk_fields":{"course_number":"422N","school_id":"marist","sequence":"111","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":10}},{"sequence":8287,"table_name":"sections","pk_fields":{"course_number":"112L","school_id":"marist","sequence":"112","subject_code":"POSC","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":6}},{"sequence":8237,"table_name":"sections","pk_fields":{"course_number":"424N","school_id":"marist","sequence":"111","subject_code":"CMPT","term_collection_id":"202440"},"sync_action":"update","relevant_fields":{"enrollment":25}},{"sequence":8218,"table_name":"term_collections","pk_fields":{"id":"202440","school_id":"marist"},"sync_action":"update","relevant_fields":null}],"new_latest_sync":8326}
+{
+  "data": [
+    {
+      "sequence": 8222,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "293L",
+        "school_id": "marist",
+        "section_sequence": "111",
+        "sequence": 0,
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "delete",
+      "relevant_fields": {}
+    },
+    {
+      "sequence": 8223,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "293L",
+        "school_id": "marist",
+        "section_sequence": "111",
+        "sequence": 1,
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "delete",
+      "relevant_fields": {}
+    },
+    {
+      "sequence": 8224,
+      "table_name": "courses",
+      "pk_fields": {
+        "number": "396N",
+        "school_id": "marist",
+        "subject_code": "HIST"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "corequisites": null,
+        "credit_hours": 6,
+        "description": null,
+        "other": null,
+        "prerequisites": null,
+        "subject_description": "History",
+        "title": "HIST INTERN I"
+      }
+    },
+    {
+      "sequence": 8225,
+      "table_name": "courses",
+      "pk_fields": {
+        "number": "292L",
+        "school_id": "marist",
+        "subject_code": "SPAN"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "corequisites": null,
+        "credit_hours": 3,
+        "description": null,
+        "other": null,
+        "prerequisites": null,
+        "subject_description": "Spanish",
+        "title": "ST:SPAN HUM SRV"
+      }
+    },
+    {
+      "sequence": 8226,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "120L",
+        "school_id": "marist",
+        "sequence": "105",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "campus": "Marist College Campus",
+        "enrollment": 0,
+        "instruction_method": "",
+        "max_enrollment": 3,
+        "other": null,
+        "primary_professor_id": null
+      }
+    },
+    {
+      "sequence": 8227,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "330N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ACCT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "max_enrollment": 25
+      }
+    },
+    {
+      "sequence": 8228,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "101L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ART",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "max_enrollment": 0
+      }
+    },
+    {
+      "sequence": 8229,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "320L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BIOL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 5
+      }
+    },
+    {
+      "sequence": 8230,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "301N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 5
+      }
+    },
+    {
+      "sequence": 8231,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "310L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8232,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "320N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8233,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "382N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 18
+      }
+    },
+    {
+      "sequence": 8234,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "420N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 24
+      }
+    },
+    {
+      "sequence": 8235,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "450N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 11
+      }
+    },
+    {
+      "sequence": 8236,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "477N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 12
+      }
+    },
+    {
+      "sequence": 8237,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "215L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CHEM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8238,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "421N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 28
+      }
+    },
+    {
+      "sequence": 8239,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "422N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 10
+      }
+    },
+    {
+      "sequence": 8240,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "424N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 25
+      }
+    },
+    {
+      "sequence": 8241,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "479N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 33
+      }
+    },
+    {
+      "sequence": 8242,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "242L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8243,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "329L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 9
+      }
+    },
+    {
+      "sequence": 8244,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "365L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8245,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "424L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 17
+      }
+    },
+    {
+      "sequence": 8246,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "202L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CRJU",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8247,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "314L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CRJU",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 11
+      }
+    },
+    {
+      "sequence": 8248,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "374L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "CRJU",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8249,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "403L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ECON",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "max_enrollment": 20
+      }
+    },
+    {
+      "sequence": 8250,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "150L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 2
+      }
+    },
+    {
+      "sequence": 8251,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "205L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 2
+      }
+    },
+    {
+      "sequence": 8252,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "234L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8253,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "317L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8254,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "380L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 9
+      }
+    },
+    {
+      "sequence": 8255,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "300N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "FASH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8256,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "304N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "FASH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8257,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "355N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "FASH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8258,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "400N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "FASH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 9
+      }
+    },
+    {
+      "sequence": 8259,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "401N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "GAME",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 18
+      }
+    },
+    {
+      "sequence": 8260,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "396N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "HIST",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "campus": "Marist College Campus",
+        "enrollment": 0,
+        "instruction_method": "",
+        "max_enrollment": 0,
+        "other": null,
+        "primary_professor_id": "Steven.Garabedian@marist.edu"
+      }
+    },
+    {
+      "sequence": 8261,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "390L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "HONR",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8262,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "391L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "HONR",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8263,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "343L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "MATH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 9
+      }
+    },
+    {
+      "sequence": 8264,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "106L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "MUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8265,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "236N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "MUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8266,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "237N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "MUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8267,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "239N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "MUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8268,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "127N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "PHED",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 9
+      }
+    },
+    {
+      "sequence": 8269,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "194N",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "PHED",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 16
+      }
+    },
+    {
+      "sequence": 8270,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "290L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "POSC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8271,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "202L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "PSYC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8272,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "210L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "PSYC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 10
+      }
+    },
+    {
+      "sequence": 8273,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "323L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "PSYC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8274,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "292L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "campus": "Marist College Campus",
+        "enrollment": 0,
+        "instruction_method": "",
+        "max_enrollment": 20,
+        "other": null,
+        "primary_professor_id": "Patricia.Macera@marist.edu"
+      }
+    },
+    {
+      "sequence": 8275,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "293L",
+        "school_id": "marist",
+        "sequence": "111",
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 0,
+        "max_enrollment": 0,
+        "primary_professor_id": null
+      }
+    },
+    {
+      "sequence": 8276,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "403N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "ACCT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 23
+      }
+    },
+    {
+      "sequence": 8277,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "110N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "ART",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "max_enrollment": 1
+      }
+    },
+    {
+      "sequence": 8278,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "320L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "BIOL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 22
+      }
+    },
+    {
+      "sequence": 8279,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "201L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CHEM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8280,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "211L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CHEM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8281,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "307N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 1
+      }
+    },
+    {
+      "sequence": 8282,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "308N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8283,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "416N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8284,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "475N",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 10
+      }
+    },
+    {
+      "sequence": 8285,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "360L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "ENSC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8286,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "273L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "HIST",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 3
+      }
+    },
+    {
+      "sequence": 8287,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "205L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "MATH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8288,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "241L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "MATH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8289,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "120L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "MDIA",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8290,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "112L",
+        "school_id": "marist",
+        "sequence": "112",
+        "subject_code": "POSC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8291,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "201L",
+        "school_id": "marist",
+        "sequence": "113",
+        "subject_code": "BIOL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 21
+      }
+    },
+    {
+      "sequence": 8292,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "215L",
+        "school_id": "marist",
+        "sequence": "113",
+        "subject_code": "CHEM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8293,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "104L",
+        "school_id": "marist",
+        "sequence": "113",
+        "subject_code": "ECON",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8294,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "226L",
+        "school_id": "marist",
+        "sequence": "113",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 2
+      }
+    },
+    {
+      "sequence": 8295,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "388N",
+        "school_id": "marist",
+        "sequence": "114",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 14
+      }
+    },
+    {
+      "sequence": 8296,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "101L",
+        "school_id": "marist",
+        "sequence": "114",
+        "subject_code": "SOC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8297,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "340N",
+        "school_id": "marist",
+        "sequence": "115",
+        "subject_code": "BUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8298,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "215L",
+        "school_id": "marist",
+        "sequence": "115",
+        "subject_code": "CHEM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 2
+      }
+    },
+    {
+      "sequence": 8299,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "241L",
+        "school_id": "marist",
+        "sequence": "115",
+        "subject_code": "MATH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 1
+      }
+    },
+    {
+      "sequence": 8300,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "130L",
+        "school_id": "marist",
+        "sequence": "116",
+        "subject_code": "BIOL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "max_enrollment": 0
+      }
+    },
+    {
+      "sequence": 8301,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "101L",
+        "school_id": "marist",
+        "sequence": "142",
+        "subject_code": "PHIL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 1
+      }
+    },
+    {
+      "sequence": 8302,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "110N",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "ART",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8303,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "206N",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "CRJU",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 14
+      }
+    },
+    {
+      "sequence": 8304,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "390L",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "CRJU",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 17
+      }
+    },
+    {
+      "sequence": 8305,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "225L",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "HLTH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8306,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "346L",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "PHIL",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8307,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "210N",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "PRLG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 6
+      }
+    },
+    {
+      "sequence": 8308,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "313N",
+        "school_id": "marist",
+        "sequence": "200",
+        "subject_code": "PRLG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 19
+      }
+    },
+    {
+      "sequence": 8309,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "602L",
+        "school_id": "marist",
+        "sequence": "232",
+        "subject_code": "PSYH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8310,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "610N",
+        "school_id": "marist",
+        "sequence": "256",
+        "subject_code": "PSYH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8311,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "618L",
+        "school_id": "marist",
+        "sequence": "256",
+        "subject_code": "PSYH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8312,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "705L",
+        "school_id": "marist",
+        "sequence": "256",
+        "subject_code": "PSYH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 8
+      }
+    },
+    {
+      "sequence": 8313,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "710N",
+        "school_id": "marist",
+        "sequence": "256",
+        "subject_code": "PSYH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8314,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "419N",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 10
+      }
+    },
+    {
+      "sequence": 8315,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "103L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8316,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "212L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 4
+      }
+    },
+    {
+      "sequence": 8317,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "325L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 14
+      }
+    },
+    {
+      "sequence": 8318,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "371L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 13
+      }
+    },
+    {
+      "sequence": 8319,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "220L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 16
+      }
+    },
+    {
+      "sequence": 8320,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "306L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "FASH",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 12
+      }
+    },
+    {
+      "sequence": 8321,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "323L",
+        "school_id": "marist",
+        "sequence": "721",
+        "subject_code": "PSYC",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 22
+      }
+    },
+    {
+      "sequence": 8322,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "242L",
+        "school_id": "marist",
+        "sequence": "722",
+        "subject_code": "MUS",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 16
+      }
+    },
+    {
+      "sequence": 8323,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "300L",
+        "school_id": "marist",
+        "sequence": "723",
+        "subject_code": "CMPT",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 5
+      }
+    },
+    {
+      "sequence": 8324,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "401L",
+        "school_id": "marist",
+        "sequence": "800",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 24
+      }
+    },
+    {
+      "sequence": 8325,
+      "table_name": "sections",
+      "pk_fields": {
+        "course_number": "401L",
+        "school_id": "marist",
+        "sequence": "801",
+        "subject_code": "COM",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "update",
+      "relevant_fields": {
+        "enrollment": 7
+      }
+    },
+    {
+      "sequence": 8326,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "120L",
+        "school_id": "marist",
+        "section_sequence": "105",
+        "sequence": 0,
+        "subject_code": "ENG",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "end_date": "2024-12-13T00:00:00",
+        "end_minutes": "15:15:00",
+        "is_friday": false,
+        "is_monday": true,
+        "is_saturday": false,
+        "is_sunday": false,
+        "is_thursday": true,
+        "is_tuesday": false,
+        "is_wednesday": false,
+        "meeting_type": "LEC",
+        "other": null,
+        "start_date": "2024-08-26T00:00:00",
+        "start_minutes": "14:00:00"
+      }
+    },
+    {
+      "sequence": 8327,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "396N",
+        "school_id": "marist",
+        "section_sequence": "111",
+        "sequence": 0,
+        "subject_code": "HIST",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "end_date": "2024-12-13T00:00:00",
+        "end_minutes": null,
+        "is_friday": false,
+        "is_monday": false,
+        "is_saturday": false,
+        "is_sunday": false,
+        "is_thursday": false,
+        "is_tuesday": false,
+        "is_wednesday": false,
+        "meeting_type": "LEC",
+        "other": null,
+        "start_date": "2024-08-26T00:00:00",
+        "start_minutes": null
+      }
+    },
+    {
+      "sequence": 8328,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "292L",
+        "school_id": "marist",
+        "section_sequence": "111",
+        "sequence": 0,
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "end_date": "2024-12-13T00:00:00",
+        "end_minutes": "15:15:00",
+        "is_friday": false,
+        "is_monday": false,
+        "is_saturday": false,
+        "is_sunday": false,
+        "is_thursday": false,
+        "is_tuesday": false,
+        "is_wednesday": true,
+        "meeting_type": "LEC",
+        "other": null,
+        "start_date": "2024-08-26T00:00:00",
+        "start_minutes": "14:00:00"
+      }
+    },
+    {
+      "sequence": 8329,
+      "table_name": "meeting_times",
+      "pk_fields": {
+        "course_number": "292L",
+        "school_id": "marist",
+        "section_sequence": "111",
+        "sequence": 1,
+        "subject_code": "SPAN",
+        "term_collection_id": "202440"
+      },
+      "sync_action": "insert",
+      "relevant_fields": {
+        "end_date": "2024-12-13T00:00:00",
+        "end_minutes": "16:45:00",
+        "is_friday": true,
+        "is_monday": false,
+        "is_saturday": false,
+        "is_sunday": false,
+        "is_thursday": false,
+        "is_tuesday": false,
+        "is_wednesday": false,
+        "meeting_type": "LEC",
+        "other": null,
+        "start_date": "2024-08-26T00:00:00",
+        "start_minutes": "15:30:00"
+      }
+    }
+  ],
+  "new_latest_sync": 8329
+}

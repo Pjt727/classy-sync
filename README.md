@@ -7,7 +7,11 @@ Each datastore may support several granularity options for getting data from cla
 - **all** - gets every exposed data point at each sync
 - **school** - choose which school(s) to sync
 - **term** -  choose which term(s) to sync
+- **compatiblity** - ability to switch between granularity options
+    - ✅ full support
+    - 🟠 some support (e.i. term sync level to school level syncs keeping the same db)
+    - ❌ no support
   
-| Datastore | all | school | term |
-|-----------|:----------:|:------:|:----:|
-| sqlite    |     ✅      |   ❌    |  ❌   |
+| Datastore | all | school | term | compatiblity|
+|-----------|:----------:|:------:|:----:| |:-----:|
+| sqlite    |     ✅      |   ❌    |  ❌   | 🟠 |

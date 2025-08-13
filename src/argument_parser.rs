@@ -1,7 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-use super::sync_requests::CommonTable;
-
 ///
 /// Sets the schools/ terms relevant for the action
 ///
@@ -11,18 +9,18 @@ use super::sync_requests::CommonTable;
 ///
 ///
 
-pub enum SomeData {
-    CommonTable(CommonTable),
+pub enum SyncResources {
+    Everything,
+    Select(SelectSyncOptions),
 }
 
 pub enum CollectionType {
-    TermValues, // only the terms themselves not the section data
-    AllTermData,
+    AllSchoolData,
     SelectTermData(HashSet<String>),
 }
 
 pub struct SelectSyncOptions {
-    school_to_collection: HashMap<String, CollectionType>,
+    pub school_to_collection: HashMap<String, CollectionType>,
 }
 
 impl SelectSyncOptions {
@@ -37,11 +35,11 @@ impl SelectSyncOptions {
             let school = school_and_maybe_term[0].to_string();
 
             if schoool_or_term.len() == 1 {
-                school_to_collection.insert(school.to_string(), CollectionType::TermValues);
-                continue;
+                // only get the terms of the school
+                todo!();
             }
             if school_and_maybe_term[1] == "all" {
-                school_to_collection.insert(school.to_string(), CollectionType::AllTermData);
+                school_to_collection.insert(school.to_string(), CollectionType::AllSchoolData);
                 continue;
             }
 

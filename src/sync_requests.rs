@@ -55,6 +55,7 @@ pub struct ClassDataSync {
 }
 
 impl ClassDataSync {
+    /// This funciton should be used to verify columns in case of sql injection
     pub fn verify_columns(&self) -> Result<(), Error> {
         let is_column = Regex::new(r"\b[a-zA-Z_]\b").unwrap();
         let invalid_cols: Vec<_> = self
@@ -102,34 +103,109 @@ impl ClassDataSync {
     }
 }
 
-// SELECT SYNCS - for getting bits of info from classy
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CommonTableSyncEntry {
-    pub table_name: CommonTable,
-    pub last_sync: u64,
+#[derive(Debug)]
+pub enum SyncOptions {
+    All(AllSync),
+    Select(SelectSync),
 }
 
+// TERM SYNCS - for getting information about specfic terms from classy
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SelectTermEntry {
-    term_collection_id: String,
-    last_sync: u64,
+#[serde(untagged)]
+pub enum SchoolEntry {
+    TermToSequence(HashMap<String, u64>),
+    Sequence(u64),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SelectSchoolEntry {
-    pub common_tables: Vec<CommonTableSyncEntry>,
-    pub select_terms: Vec<SelectTermEntry>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SelectSync {
-    /// mapping from school_id to last sync entries
-    pub select_schools: HashMap<String, SelectSchoolEntry>,
+    exclude: HashMap<String, HashMap<String, u64>>,
+    max_records_per_request: Option<u16>,
+    schools: HashMap<String, SchoolEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct SelectSyncResult {
-    pub select_schools: HashMap<String, SelectSchoolEntry>,
+impl SelectSync {
+    pub fn new() -> SelectSync {
+        SelectSync {
+            ..Default::default()
+        }
+    }
+
+    pub fn get_exclusions(&self) -> &HashMap<String, HashMap<String, u64>> {
+        return &self.exclude;
+    }
+
+    pub fn get_max_records(&self) -> Option<u16> {
+        return self.max_records_per_request;
+    }
+
+    pub fn get_schools(&self) -> &HashMap<String, SchoolEntry> {
+        return &self.schools;
+    }
+
+    // all of these setter methods are pretty picky so maybe just make they less so
+
+    pub fn add_school_sync(&mut self, school_id: String, synced_at: u64) -> Result<(), Error> {
+        if self.schools.contains_key(&school_id) {
+            return Err(SyncError::new(format!(
+                "school_id `{}` is already set",
+                school_id
+            )));
+        }
+        self.schools
+            .insert(school_id, SchoolEntry::Sequence(synced_at));
+        Ok(())
+    }
+
+    pub fn add_term_sync(
+        &mut self,
+        school_id: String,
+        term_collection_id: String,
+        synced_at: u64,
+    ) -> Result<(), Error> {
+        let school_entry = self
+            .schools
+            .entry(school_id)
+            .or_insert(SchoolEntry::TermToSequence(HashMap::new()));
+        match school_entry {
+            SchoolEntry::TermToSequence(terms) => {
+                if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
+                    return Err(SyncError::new(format!(
+                        "This term already was set to sync with {}",
+                        old_sync
+                    )));
+                }
+            }
+            SchoolEntry::Sequence(sequence) => {
+                return Err(SyncError::new(format!(
+                    "school id already being synced with {}",
+                    sequence
+                )));
+            }
+        };
+        Ok(())
+    }
+
+    pub fn add_exclusion(
+        &mut self,
+        school_id: String,
+        term_collection_id: String,
+        synced_at: u64,
+    ) -> Result<(), Error> {
+        let terms = self.exclude.entry(school_id).or_insert_with(HashMap::new);
+        if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
+            return Err(SyncError::new(format!(
+                "This term already was set as an exclusion with {}",
+                old_sync
+            )));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TermSyncResult {
+    pub schools: HashMap<String, SchoolEntry>,
     pub data: Vec<ClassDataSync>,
 }
 
@@ -138,6 +214,7 @@ pub struct SelectSyncResult {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllSync {
     pub last_sync: u64,
+    pub max_records_count: Option<u16>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
