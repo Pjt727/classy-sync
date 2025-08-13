@@ -4,6 +4,7 @@ mod data_stores;
 mod errors;
 mod replicate_datastore;
 mod sync_requests;
+use dotenv::dotenv;
 use env_logger;
 use lazy_static::lazy_static;
 use replicate_datastore::Datastore;
@@ -12,11 +13,11 @@ use std::env;
 
 use crate::argument_parser::SyncResources;
 
-const SYNC_DOMAIN: &str = "localhost:3000";
+const SYNC_DOMAIN: &str = "http://localhost:3000";
 
 lazy_static! {
     static ref SYNC_ALL_ROUTE: String = format!("{}/sync/all", SYNC_DOMAIN);
-    static ref SYNC_SELECT_ROUTE: String = format!("{}/sync/select", SYNC_DOMAIN);
+    static ref SYNC_SELECT_ROUTE: String = format!("{}/sync/schools", SYNC_DOMAIN);
 }
 
 // TODO: eventually this file will also be responsible for
@@ -24,12 +25,13 @@ lazy_static! {
 //   - pagination
 
 fn main() {
+    dotenv().ok();
     env_logger::init();
 
     // for now just taking the first argument as
     let args: Vec<String> = env::args().collect();
     let mut data_store = data_stores::sqlite::Sqlite::new().unwrap();
-    if args.len() >= 1 {
+    if args.len() >= 2 {
         let sync_instructions = args.get(1).unwrap();
         if sync_instructions == "all" {
             data_store
@@ -43,6 +45,7 @@ fn main() {
                 .unwrap();
         }
     }
+
     let client = Client::new();
     sync(client, &mut data_store);
 }
@@ -63,7 +66,7 @@ fn sync(client: Client, data_store: &mut dyn Datastore) {
 
         sync_requests::SyncOptions::Select(select_sync) => {
             let response: sync_requests::TermSyncResult = client
-                .get(SYNC_SELECT_ROUTE.to_string())
+                .post(SYNC_SELECT_ROUTE.to_string())
                 .json(&select_sync)
                 .send()
                 .unwrap()

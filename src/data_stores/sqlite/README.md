@@ -6,4 +6,4 @@
 - this data should be treated as an source of truth you have no control over
 ## constraints
 - there is limited support for going in between granularity level
-- 
+- can only go from term sync to school sync

@@ -1,10 +1,11 @@
 use super::errors::{Error, SyncError};
 use regex::Regex;
-use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use strum_macros::Display;
+
+const DEFUALT_MAX_RECORDS: u16 = 10_000;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -127,6 +128,7 @@ pub struct SelectSync {
 impl SelectSync {
     pub fn new() -> SelectSync {
         SelectSync {
+            max_records_per_request: Some(DEFUALT_MAX_RECORDS),
             ..Default::default()
         }
     }
@@ -205,8 +207,8 @@ impl SelectSync {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TermSyncResult {
-    pub schools: HashMap<String, SchoolEntry>,
-    pub data: Vec<ClassDataSync>,
+    pub new_sync_term_sequences: HashMap<String, SchoolEntry>,
+    pub sync_data: Vec<ClassDataSync>,
 }
 
 // ALL SYNCS - for getting all information from class
@@ -220,20 +222,5 @@ pub struct AllSync {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllSyncResult {
     pub new_latest_sync: u64,
-    pub data: Vec<ClassDataSync>,
-}
-
-fn sync_all(
-    client: &Client,
-    sync_all_route: &String,
-    sync_options: AllSync,
-) -> Result<AllSyncResult, Error> {
-    let sync_response = client.get(sync_all_route).query(&sync_options).send()?;
-
-    if sync_response.status().is_success() {
-        let my_data: AllSyncResult = sync_response.json()?;
-        Ok(my_data)
-    } else {
-        Err(SyncError::new(sync_response.status()))
-    }
+    pub sync_data: Vec<ClassDataSync>,
 }

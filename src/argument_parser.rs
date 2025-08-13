@@ -9,16 +9,19 @@ use std::collections::{HashMap, HashSet};
 ///
 ///
 
+#[derive(Debug)]
 pub enum SyncResources {
     Everything,
     Select(SelectSyncOptions),
 }
 
+#[derive(Debug)]
 pub enum CollectionType {
     AllSchoolData,
     SelectTermData(HashSet<String>),
 }
 
+#[derive(Debug)]
 pub struct SelectSyncOptions {
     pub school_to_collection: HashMap<String, CollectionType>,
 }
@@ -34,15 +37,13 @@ impl SelectSyncOptions {
             assert_eq!(school_and_maybe_term.len(), 1, "No school given?");
             let school = school_and_maybe_term[0].to_string();
 
-            if schoool_or_term.len() == 1 {
-                // only get the terms of the school
-                todo!();
-            }
-            if school_and_maybe_term[1] == "all" {
+            // it is only the school
+            if school_and_maybe_term.len() == 1 {
                 school_to_collection.insert(school.to_string(), CollectionType::AllSchoolData);
                 continue;
             }
 
+            // the rest of the comma separated entry are terms
             school_to_collection.insert(
                 school.to_string(),
                 CollectionType::SelectTermData(
@@ -54,7 +55,7 @@ impl SelectSyncOptions {
             );
         }
         return SelectSyncOptions {
-            school_to_collection: HashMap::new(),
+            school_to_collection,
         };
     }
 }

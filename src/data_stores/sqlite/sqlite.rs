@@ -192,8 +192,7 @@ impl Sqlite {
         Ok(self.conn.query_row(
             r#" 
         SELECT (
-            EXISTS (SELECT 1 FROM _previous_school_collections) 
-            OR EXISTS (SELECT 1 FROM _previous_term_collections)
+            EXISTS (SELECT 1 FROM _school_strategies) 
         );
         "#,
             (),
@@ -228,9 +227,9 @@ impl Sqlite {
         }
         let mut all_school_query = self.conn.prepare(
             r#" 
-                SELECT s.school_id, MAX(p.synced_at) AS sequence
+                SELECT s.school_id, COALESCE(MAX(p.synced_at), 0) AS sequence
                 FROM _school_strategies s
-                INNER JOIN _previous_school_collections p ON s.school_id = p.school_id
+                LEFT JOIN _previous_school_collections p ON s.school_id = p.school_id
                 WHERE s.term_collection_id IS NULL
                 GROUP BY s.school_id
                 ;
@@ -245,9 +244,9 @@ impl Sqlite {
 
         let mut term_school_query = self.conn.prepare(
             r#" 
-                SELECT s.school_id, s.term_collection_id, MAX(p.synced_at) AS sequence
+                SELECT s.school_id, s.term_collection_id, COALESCE(MAX(p.synced_at), 0) AS sequence
                 FROM _school_strategies s
-                INNER JOIN _previous_term_collections p 
+                LEFT JOIN _previous_term_collections p 
                     ON s.school_id = p.school_id AND s.term_collection_id = p.term_collection_id
                 WHERE s.term_collection_id IS NOT NULL
                 GROUP BY s.school_id, s.term_collection_id
@@ -291,7 +290,7 @@ impl Datastore for Sqlite {
         "#,
             (all_sync_response.new_latest_sync,),
         )?;
-        for sync in all_sync_response.data.into_iter() {
+        for sync in all_sync_response.sync_data.into_iter() {
             Sqlite::execute_sync(&tx, sync)?
         }
         tx.commit()?;
@@ -305,7 +304,7 @@ impl Datastore for Sqlite {
     ) -> Result<(), Error> {
         let _ = select_sync_request;
         let tx = self.conn.transaction()?;
-        for (school_id, entry) in &select_sync_response.schools {
+        for (school_id, entry) in &select_sync_response.new_sync_term_sequences {
             match entry {
                 sync_requests::SchoolEntry::TermToSequence(term_sequence) => {
                     for (term, sequence) in term_sequence {
@@ -329,7 +328,7 @@ impl Datastore for Sqlite {
                 }
             }
         }
-        for sync in select_sync_response.data.into_iter() {
+        for sync in select_sync_response.sync_data.into_iter() {
             Sqlite::execute_sync(&tx, sync)?
         }
         tx.commit()?;
@@ -470,7 +469,6 @@ mod sync_tests {
         env_logger::init();
         let mut conn;
         if let Ok(path_to_sqlite_db) = env::var("TEST_SQLITE_DB_PATH") {
-            dbg!(&path_to_sqlite_db);
             let file_path = Path::new(&path_to_sqlite_db);
             if file_path.exists() {
                 fs::remove_file(file_path).unwrap()
@@ -509,8 +507,7 @@ mod sync_tests {
             let tx = conn.transaction().unwrap();
             let updates_text = fs::read_to_string(&full_path).unwrap();
             let response: AllSyncResult = from_str(&updates_text).unwrap();
-            dbg!(&test_sync);
-            for update in response.data {
+            for update in response.sync_data {
                 Sqlite::execute_sync(&tx, update).unwrap()
             }
             tx.commit().unwrap();
