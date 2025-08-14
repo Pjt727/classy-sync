@@ -1,4 +1,4 @@
-use super::errors::{Error, SyncError};
+use crate::errors::{Error, SyncError};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

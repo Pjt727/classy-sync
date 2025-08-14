@@ -1,8 +1,10 @@
-use crate::argument_parser::SyncResources;
-use crate::sync_requests::SyncOptions;
+// use crate::argument_parser::SyncResources;
 
-use super::errors::Error;
-use super::sync_requests::{AllSyncResult, SelectSync, TermSyncResult};
+use crate::argument_parser::SyncResources;
+
+// use super::super::errors::Error;
+use super::sync_requests::{AllSyncResult, SelectSync, SyncOptions, TermSyncResult};
+use crate::errors::Error;
 
 /// Datastores may choose to make it possible to have all syncs / schools syncs /term syncs work
 /// with each other, but they may also choose to make some of them mutaully exclusive
@@ -17,4 +19,9 @@ pub trait Datastore {
         select_sync_request: SelectSync,
         select_sync_response: TermSyncResult,
     ) -> Result<(), Error>;
+}
+
+/// gets the datastore that is selected as per the feature flags
+pub fn get_datastore() -> Result<Box<dyn Datastore>, Error> {
+    return Ok(Box::new(super::sqlite::Sqlite::new()?));
 }

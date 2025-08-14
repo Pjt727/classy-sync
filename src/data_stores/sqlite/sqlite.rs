@@ -1,10 +1,10 @@
 use crate::argument_parser::{CollectionType, SyncResources};
-use crate::errors::{Error, SyncError};
-use crate::replicate_datastore::Datastore;
-use crate::sync_requests::{
+use crate::data_stores::replicate_datastore::Datastore;
+use crate::data_stores::sync_requests::{
     self, AllSync, AllSyncResult, ClassDataSync, SelectSync, SyncAction, SyncOptions,
     TermSyncResult,
 };
+use crate::errors::{Error, SyncError};
 use log::{trace, warn};
 use rusqlite::{Connection, Transaction, params_from_iter};
 use serde_json::Value;

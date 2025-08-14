@@ -1,17 +1,14 @@
 #![allow(dead_code)]
-mod argument_parser;
-mod data_stores;
-mod errors;
-mod replicate_datastore;
-mod sync_requests;
+use classy_sync::argument_parser::SelectSyncOptions;
+use classy_sync::argument_parser::SyncResources;
+use classy_sync::data_stores::{
+    replicate_datastore, replicate_datastore::Datastore, sync_requests,
+};
 use dotenv::dotenv;
 use env_logger;
 use lazy_static::lazy_static;
-use replicate_datastore::Datastore;
 use reqwest::blocking::Client;
 use std::env;
-
-use crate::argument_parser::SyncResources;
 
 const SYNC_DOMAIN: &str = "http://localhost:3000";
 
@@ -30,7 +27,7 @@ fn main() {
 
     // for now just taking the first argument as
     let args: Vec<String> = env::args().collect();
-    let mut data_store = data_stores::sqlite::Sqlite::new().unwrap();
+    let mut data_store = replicate_datastore::get_datastore().unwrap();
     if args.len() >= 2 {
         let sync_instructions = args.get(1).unwrap();
         if sync_instructions == "all" {
@@ -38,8 +35,7 @@ fn main() {
                 .set_request_sync_resources(SyncResources::Everything)
                 .unwrap();
         } else {
-            let sync_options =
-                argument_parser::SelectSyncOptions::from_input(sync_instructions.to_string());
+            let sync_options = SelectSyncOptions::from_input(sync_instructions.to_string());
             data_store
                 .set_request_sync_resources(SyncResources::Select(sync_options))
                 .unwrap();
@@ -47,7 +43,7 @@ fn main() {
     }
 
     let client = Client::new();
-    sync(client, &mut data_store);
+    sync(client, &mut *data_store);
 }
 
 fn sync(client: Client, data_store: &mut dyn Datastore) {
