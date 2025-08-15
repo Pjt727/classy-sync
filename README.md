@@ -26,8 +26,8 @@ Each datastore may support several granularity options for getting data from cla
     <tr>
       <td>sqlite</td>
       <td>✅</td>
-      <td>❌</td>
-      <td>❌</td>
+      <td>✅</td>
+      <td>✅</td>
       <td>🟠</td>
     </tr>
   </tbody>
