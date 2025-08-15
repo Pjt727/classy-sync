@@ -3,6 +3,10 @@ name = "classy-sync"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["sqlite"]
+sqlite = ["dep:rusqlite"]
+
 [dependencies]
 env_logger = "0.11.7"
 log = "0.4.26"
@@ -15,4 +19,7 @@ strum = { version="0.27.1", features = ["derive"] }
 strum_macros = "0.27.1"
 dotenv = "0.15.0"
 lazy_static = "1.5.0"
-rusqlite = { version="0.37.0", features = ["bundled", "array"] }
+rusqlite = { version="0.37.0", features = ["bundled", "array"], optional = true }
+
+[dev-dependencies]
+mockito = "1.4.0"

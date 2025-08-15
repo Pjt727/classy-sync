@@ -20,6 +20,6 @@ impl std::error::Error for SyncError {}
 
 impl fmt::Display for SyncError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Oh no, something bad went down")
+        write!(f, "Error: {}", self.message)
     }
 }

@@ -1,2 +1,2 @@
-pub mod sqlite;
-pub use sqlite::Sqlite;
+pub mod storage;
+pub use storage::Sqlite;

@@ -5,7 +5,6 @@ use classy_sync::data_stores::{
     replicate_datastore, replicate_datastore::Datastore, sync_requests,
 };
 use dotenv::dotenv;
-use env_logger;
 use lazy_static::lazy_static;
 use reqwest::blocking::Client;
 use std::env;
@@ -20,6 +19,20 @@ lazy_static! {
 // TODO: eventually this file will also be responsible for
 //   - authentication?
 //   - pagination
+
+pub struct SyncConfig {
+    pub sync_all: String,
+    pub sync_select: String,
+}
+
+impl Default for SyncConfig {
+    fn default() -> Self {
+        SyncConfig {
+            sync_all: SYNC_ALL_ROUTE.clone(),
+            sync_select: SYNC_SELECT_ROUTE.clone(),
+        }
+    }
+}
 
 fn main() {
     dotenv().ok();
@@ -43,15 +56,15 @@ fn main() {
     }
 
     let client = Client::new();
-    sync(client, &mut *data_store);
+    sync(client, SyncConfig::default(), &mut *data_store);
 }
 
-fn sync(client: Client, data_store: &mut dyn Datastore) {
+fn sync(client: Client, routes: SyncConfig, data_store: &mut dyn Datastore) {
     let request_options = data_store.generate_sync_options().unwrap();
     match request_options {
         sync_requests::SyncOptions::All(all_sync) => {
             let response: sync_requests::AllSyncResult = client
-                .get(SYNC_ALL_ROUTE.to_string())
+                .get(routes.sync_all)
                 .query(&all_sync)
                 .send()
                 .unwrap()
@@ -62,7 +75,7 @@ fn sync(client: Client, data_store: &mut dyn Datastore) {
 
         sync_requests::SyncOptions::Select(select_sync) => {
             let response: sync_requests::TermSyncResult = client
-                .post(SYNC_SELECT_ROUTE.to_string())
+                .post(routes.sync_select)
                 .json(&select_sync)
                 .send()
                 .unwrap()
@@ -72,5 +85,24 @@ fn sync(client: Client, data_store: &mut dyn Datastore) {
                 .execute_select_request_sync(select_sync, response)
                 .unwrap()
         }
+    }
+}
+
+#[cfg(test)]
+mod sync_tests {
+    use super::*;
+    use classy_sync::data_stores::replicate_datastore::get_datastore;
+    use dotenv::dotenv;
+
+    // TODO: add mock tests
+    #[test]
+    fn full_sync() {
+        dotenv().ok();
+        env_logger::init();
+        let mut sqlite_datastore = get_datastore().expect("Could not get sqlite data store");
+
+        sqlite_datastore
+            .set_request_sync_resources(SyncResources::Everything)
+            .unwrap()
     }
 }

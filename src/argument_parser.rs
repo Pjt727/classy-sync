@@ -23,7 +23,7 @@ pub enum CollectionType {
 
 #[derive(Debug)]
 pub struct SelectSyncOptions {
-    pub school_to_collection: HashMap<String, CollectionType>,
+    school_to_collection: HashMap<String, CollectionType>,
 }
 
 impl SelectSyncOptions {
@@ -54,8 +54,12 @@ impl SelectSyncOptions {
                 ),
             );
         }
-        return SelectSyncOptions {
+        SelectSyncOptions {
             school_to_collection,
-        };
+        }
+    }
+
+    pub fn get_collections(&self) -> &HashMap<String, CollectionType> {
+        &self.school_to_collection
     }
 }

@@ -20,6 +20,16 @@ pub struct Sqlite {
 }
 
 impl Sqlite {
+    #[cfg(not(test))]
+    pub fn new() -> Result<Sqlite, Error> {
+        let db_path = env::var("SQLITE_DB_PATH")?;
+        let file_path = Path::new(&db_path);
+        Ok(Sqlite {
+            conn: Sqlite::get_db_connection(file_path)?,
+        })
+    }
+
+    #[cfg(test)]
     pub fn new() -> Result<Sqlite, Error> {
         let db_path = env::var("SQLITE_DB_PATH")?;
         let file_path = Path::new(&db_path);
@@ -55,7 +65,7 @@ impl Sqlite {
         let result = match sync.sync_action {
             SyncAction::Update => {
                 if sync.relevant_fields.is_none()
-                    || sync.relevant_fields.as_ref().unwrap().len() == 0
+                    || sync.relevant_fields.as_ref().unwrap().is_empty()
                 {
                     warn!("Update sync with no changes: `{:?}`", sync);
                     return Ok(());
@@ -69,22 +79,22 @@ impl Sqlite {
                     .unwrap_or(&HashMap::new())
                     .iter()
                 {
-                    match convert_to_sql_value(&val) {
+                    match convert_to_sql_value(val) {
                         Ok(v) => param_args.push(v),
                         Err(e) => return Err(e),
                     }
                     arg_counter += 1;
-                    set_values.push(format!("{} = ?{}", col, arg_counter))
+                    set_values.push(format!("{col} = ?{arg_counter}"))
                 }
                 let set_values = set_values.join(", ");
                 let mut where_values = vec![];
                 for (col, val) in sync.pk_fields.iter() {
-                    match convert_to_sql_value(&val) {
+                    match convert_to_sql_value(val) {
                         Ok(v) => param_args.push(v),
                         Err(e) => return Err(e),
                     }
                     arg_counter += 1;
-                    where_values.push(format!("{} = ?{}", col, arg_counter))
+                    where_values.push(format!("{col} = ?{arg_counter}"))
                 }
 
                 let where_values = where_values.join(" AND ");
@@ -102,12 +112,12 @@ impl Sqlite {
                 let mut param_args: Vec<rusqlite::types::Value> = vec![];
                 let mut where_values = vec![];
                 for (col, val) in sync.pk_fields.iter() {
-                    match convert_to_sql_value(&val) {
+                    match convert_to_sql_value(val) {
                         Ok(v) => param_args.push(v),
                         Err(e) => return Err(e),
                     }
                     arg_counter += 1;
-                    where_values.push(format!("{} = ?{}", col, arg_counter))
+                    where_values.push(format!("{col} = ?{arg_counter}"))
                 }
                 let where_values = where_values.join(" AND ");
 
@@ -122,13 +132,13 @@ impl Sqlite {
                 let mut columns = vec![];
                 let mut values = vec![];
                 for (col, val) in sync.pk_fields.iter() {
-                    match convert_to_sql_value(&val) {
+                    match convert_to_sql_value(val) {
                         Ok(v) => param_args.push(v),
                         Err(e) => return Err(e),
                     }
                     arg_counter += 1;
                     columns.push(col.to_string());
-                    values.push(format!("?{}", arg_counter))
+                    values.push(format!("?{arg_counter}"))
                 }
                 for (col, val) in sync
                     .relevant_fields
@@ -136,13 +146,13 @@ impl Sqlite {
                     .unwrap_or(&HashMap::new())
                     .iter()
                 {
-                    match convert_to_sql_value(&val) {
+                    match convert_to_sql_value(val) {
                         Ok(v) => param_args.push(v),
                         Err(e) => return Err(e),
                     }
                     arg_counter += 1;
                     columns.push(col.to_string());
-                    values.push(format!("?{}", arg_counter))
+                    values.push(format!("?{arg_counter}"))
                 }
                 let columns = columns.join(", ");
                 let values = values.join(", ");
@@ -163,16 +173,13 @@ impl Sqlite {
                     if num != 1 {
                         warn!("Query affected {} rows expected 1", num)
                     }
-                    return Ok(());
+                    Ok(())
                 }
-                Err(err) => {
-                    return Err(SyncError::new(&format!("Error executing query {:?}", err)));
-                }
+                Err(err) => Err(SyncError::new(format!("Error executing query {err:?}"))),
             },
-            Err(err) => Err(SyncError::new(&format!(
-                "Error preparing statement {:?}",
-                err,
-            ))),
+            Err(err) => Err(SyncError::new(
+                format!("Error preparing statement {err:?}",),
+            )),
         }
     }
 
@@ -213,10 +220,10 @@ impl Sqlite {
             (),
             |row| row.get(0),
         )?;
-        return Ok(AllSync {
+        Ok(AllSync {
             last_sync,
             max_records_count: Some(DEFAULT_MAX_RECORDS),
-        });
+        })
     }
 
     fn get_select_request_options(&mut self) -> Result<SelectSync, Error> {
@@ -294,7 +301,7 @@ impl Datastore for Sqlite {
             Sqlite::execute_sync(&tx, sync)?
         }
         tx.commit()?;
-        return Ok(());
+        Ok(())
     }
 
     fn execute_select_request_sync(
@@ -332,7 +339,7 @@ impl Datastore for Sqlite {
             Sqlite::execute_sync(&tx, sync)?
         }
         tx.commit()?;
-        return Ok(());
+        Ok(())
     }
 
     fn generate_sync_options(&mut self) -> Result<SyncOptions, Error> {
@@ -386,7 +393,8 @@ impl Datastore for Sqlite {
                 for f in full_school_collections_rows {
                     full_school_collections.insert(f?);
                 }
-                for (school_id, collection_type) in select_sync_options.school_to_collection {
+
+                for (school_id, collection_type) in select_sync_options.get_collections() {
                     match collection_type {
                         CollectionType::AllSchoolData => {
                             if !full_school_collections.contains(&(school_id.clone(), None)) {
@@ -403,8 +411,7 @@ impl Datastore for Sqlite {
                         CollectionType::SelectTermData(terms) => {
                             if full_school_collections.contains(&(school_id.clone(), None)) {
                                 return Err(SyncError::new(format!(
-                                    "Cannot do select term sync for school `{}` because the whole school as been synced",
-                                    school_id
+                                    "Cannot do select term sync for school `{school_id}` because the whole school as been synced"
                                 )));
                             }
                             for term in terms {
@@ -417,7 +424,7 @@ impl Datastore for Sqlite {
                                         (school_id, term_collection_id) 
                                         VALUES (?, ?)
                                         "#,
-                                        [school_id.clone(), term],
+                                        [school_id, term],
                                     )?;
                                 }
                             }
@@ -449,7 +456,7 @@ fn convert_to_sql_value(v: &Value) -> Result<rusqlite::types::Value, Error> {
                 Ok(rusqlite::types::Value::Null)
             }
         }
-        _ => Err(SyncError::new(format!("Unsupported type {:?}", v))),
+        _ => Err(SyncError::new(format!("Unsupported type {v:?}"))),
     }
 }
 

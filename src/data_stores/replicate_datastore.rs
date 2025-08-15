@@ -1,8 +1,5 @@
-// use crate::argument_parser::SyncResources;
-
 use crate::argument_parser::SyncResources;
 
-// use super::super::errors::Error;
 use super::sync_requests::{AllSyncResult, SelectSync, SyncOptions, TermSyncResult};
 use crate::errors::Error;
 
@@ -21,7 +18,13 @@ pub trait Datastore {
     ) -> Result<(), Error>;
 }
 
-/// gets the datastore that is selected as per the feature flags
+/// gets the datastore that is selected as per the first feature
 pub fn get_datastore() -> Result<Box<dyn Datastore>, Error> {
+    #[cfg(feature = "sqlite")]
     return Ok(Box::new(super::sqlite::Sqlite::new()?));
+
+    #[allow(unreachable_code)]
+    {
+        unreachable!("A data store backend feature must be enabled at compile time.")
+    }
 }

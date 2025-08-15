@@ -74,7 +74,7 @@ impl ClassDataSync {
             .collect();
 
         if !invalid_cols.is_empty() {
-            return Err(SyncError::new(&format!(
+            return Err(SyncError::new(format!(
                 "`{:?}` There is are invalid column(s) in relevant fields: {}",
                 self.relevant_fields,
                 invalid_cols.join(", ")
@@ -93,7 +93,7 @@ impl ClassDataSync {
             })
             .collect();
         if !invalid_cols.is_empty() {
-            return Err(SyncError::new(&format!(
+            return Err(SyncError::new(format!(
                 "`{:?}` There is an invalid column in pk fields: {}",
                 self.pk_fields,
                 invalid_cols.join(", ")
@@ -134,15 +134,15 @@ impl SelectSync {
     }
 
     pub fn get_exclusions(&self) -> &HashMap<String, HashMap<String, u64>> {
-        return &self.exclude;
+        &self.exclude
     }
 
     pub fn get_max_records(&self) -> Option<u16> {
-        return self.max_records_per_request;
+        self.max_records_per_request
     }
 
     pub fn get_schools(&self) -> &HashMap<String, SchoolEntry> {
-        return &self.schools;
+        &self.schools
     }
 
     // all of these setter methods are pretty picky so maybe just make they less so
@@ -150,8 +150,7 @@ impl SelectSync {
     pub fn add_school_sync(&mut self, school_id: String, synced_at: u64) -> Result<(), Error> {
         if self.schools.contains_key(&school_id) {
             return Err(SyncError::new(format!(
-                "school_id `{}` is already set",
-                school_id
+                "school_id `{school_id}` is already set"
             )));
         }
         self.schools
@@ -173,15 +172,13 @@ impl SelectSync {
             SchoolEntry::TermToSequence(terms) => {
                 if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
                     return Err(SyncError::new(format!(
-                        "This term already was set to sync with {}",
-                        old_sync
+                        "This term already was set to sync with {old_sync}"
                     )));
                 }
             }
             SchoolEntry::Sequence(sequence) => {
                 return Err(SyncError::new(format!(
-                    "school id already being synced with {}",
-                    sequence
+                    "school id already being synced with {sequence}",
                 )));
             }
         };
@@ -194,11 +191,10 @@ impl SelectSync {
         term_collection_id: String,
         synced_at: u64,
     ) -> Result<(), Error> {
-        let terms = self.exclude.entry(school_id).or_insert_with(HashMap::new);
+        let terms = self.exclude.entry(school_id).or_default();
         if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
             return Err(SyncError::new(format!(
-                "This term already was set as an exclusion with {}",
-                old_sync
+                "This term already was set as an exclusion with {old_sync}"
             )));
         }
         Ok(())
