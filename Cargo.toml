@@ -1,6 +1,6 @@
 [package]
 name = "classy-sync"
-version = "0.1.0"
+version = "0.1.1"
 license = "MIT"
 description = "Sync data from classy to other data stores"
 repository = "https://github.com/Pjt727/classy-sync"
