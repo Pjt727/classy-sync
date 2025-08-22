@@ -4,7 +4,7 @@ use crate::data_stores::sync_requests::{
     self, AllSync, AllSyncResult, ClassDataSync, SelectSync, SyncAction, SyncOptions,
     TermSyncResult,
 };
-use crate::errors::{Error, SyncError};
+use crate::errors::Error;
 use log::{trace, warn};
 use rusqlite::{Connection, Transaction, params_from_iter};
 use serde_json::Value;
@@ -22,7 +22,7 @@ pub struct Sqlite {
 impl Sqlite {
     #[cfg(not(test))]
     pub fn new() -> Result<Sqlite, Error> {
-        let db_path = env::var("SQLITE_DB_PATH")?;
+        let db_path = env::var("SQLITE_DB_PATH").map_err(Error::data_store_error)?;
         let file_path = Path::new(&db_path);
         Ok(Sqlite {
             conn: Sqlite::get_db_connection(file_path)?,
@@ -31,7 +31,7 @@ impl Sqlite {
 
     #[cfg(test)]
     pub fn new() -> Result<Sqlite, Error> {
-        let db_path = env::var("SQLITE_DB_PATH")?;
+        let db_path = env::var("SQLITE_DB_PATH").map_err(Error::data_store_error)?;
         let file_path = Path::new(&db_path);
         Ok(Sqlite {
             conn: Sqlite::get_db_connection(file_path)?,
@@ -41,21 +41,23 @@ impl Sqlite {
     fn get_db_connection(file_path: &Path) -> Result<Connection, Error> {
         if !file_path.exists() {
             if let Some(parent_dir) = file_path.parent() {
-                fs::create_dir_all(parent_dir)?;
+                fs::create_dir_all(parent_dir).map_err(Error::data_store_error)?;
             }
-            fs::File::create(file_path)?;
+            fs::File::create(file_path).map_err(Error::data_store_error)?;
             // TODO: embed the migrations into the build process and run up migrations
             let up_migration_classy =
                 fs::read_to_string("src/data_stores/sqlite/migrations/001.up.sql").unwrap();
             let up_migration_sync =
                 fs::read_to_string("src/data_stores/sqlite/migrations/002.up.sql").unwrap();
-            let conn = Connection::open(file_path)?;
-            conn.execute_batch(&up_migration_classy)?;
-            conn.execute_batch(&up_migration_sync)?;
+            let conn = Connection::open(file_path).map_err(Error::data_store_error)?;
+            conn.execute_batch(&up_migration_classy)
+                .map_err(Error::data_store_error)?;
+            conn.execute_batch(&up_migration_sync)
+                .map_err(Error::data_store_error)?;
             Ok(conn)
         } else {
             // TODO: check to see if the migrations are up to date
-            Ok(Connection::open(file_path)?)
+            Ok(Connection::open(file_path).map_err(Error::data_store_error)?)
         }
     }
     // this is the crux of the sqlite data store... being able to convert a `ClassDataSync` into a
@@ -175,51 +177,58 @@ impl Sqlite {
                     }
                     Ok(())
                 }
-                Err(err) => Err(SyncError::new(format!("Error executing query {err:?}"))),
+                Err(err) => Err(Error::sync_error(format!("Error executing query {err:?}"))),
             },
-            Err(err) => Err(SyncError::new(
-                format!("Error preparing statement {err:?}",),
-            )),
+            Err(err) => Err(Error::sync_error(format!(
+                "Error preparing statement {err:?}",
+            ))),
         }
     }
 
     fn is_all_sync(&mut self) -> Result<bool, Error> {
-        Ok(self.conn.query_row(
-            r#" 
+        self.conn
+            .query_row(
+                r#" 
             SELECT EXISTS (
                 SELECT 1 FROM _previous_all_collections
             );
             "#,
-            (),
-            |row| row.get(0),
-        )?)
+                (),
+                |row| row.get(0),
+            )
+            .map_err(Error::data_store_error)
     }
 
     fn is_select_sync(&mut self) -> Result<bool, Error> {
-        Ok(self.conn.query_row(
-            r#" 
+        self.conn
+            .query_row(
+                r#" 
         SELECT (
             EXISTS (SELECT 1 FROM _school_strategies) 
         );
         "#,
-            (),
-            |row| row.get(0),
-        )?)
+                (),
+                |row| row.get(0),
+            )
+            .map_err(Error::data_store_error)
     }
     fn get_all_request_options(&mut self) -> Result<AllSync, Error> {
         if self.is_select_sync()? {
-            return Err(SyncError::new(
+            return Err(Error::sync_error(
                 "Cannot sync all because term sync and or school sync was ran before",
             ));
         }
-        let last_sync: u64 = self.conn.query_row(
-            r#" 
+        let last_sync: u64 = self
+            .conn
+            .query_row(
+                r#" 
                 SELECT COALESCE(MAX(synced_at), 0)
                 FROM _previous_all_collections;
             "#,
-            (),
-            |row| row.get(0),
-        )?;
+                (),
+                |row| row.get(0),
+            )
+            .map_err(Error::data_store_error)?;
         Ok(AllSync {
             last_sync,
             max_records_count: Some(DEFAULT_MAX_RECORDS),
@@ -228,12 +237,14 @@ impl Sqlite {
 
     fn get_select_request_options(&mut self) -> Result<SelectSync, Error> {
         if self.is_all_sync()? {
-            return Err(SyncError::new(
+            return Err(Error::sync_error(
                 "Cannot sync select because sync all has been run previously",
             ));
         }
-        let mut all_school_query = self.conn.prepare(
-            r#" 
+        let mut all_school_query = self
+            .conn
+            .prepare(
+                r#" 
                 SELECT s.school_id, COALESCE(MAX(p.synced_at), 0) AS sequence
                 FROM _school_strategies s
                 LEFT JOIN _previous_school_collections p ON s.school_id = p.school_id
@@ -241,16 +252,21 @@ impl Sqlite {
                 GROUP BY s.school_id
                 ;
             "#,
-        )?;
+            )
+            .map_err(Error::data_store_error)?;
         let school_to_last_sequence = all_school_query
             .query_map((), |r| {
                 let res: (String, u64) = (r.get(0)?, r.get(1)?);
                 Ok(res)
-            })?
-            .collect::<Result<HashMap<_, _>, _>>()?;
+            })
+            .map_err(Error::data_store_error)?
+            .collect::<Result<HashMap<_, _>, _>>()
+            .map_err(Error::data_store_error)?;
 
-        let mut term_school_query = self.conn.prepare(
-            r#" 
+        let mut term_school_query = self
+            .conn
+            .prepare(
+                r#" 
                 SELECT s.school_id, s.term_collection_id, COALESCE(MAX(p.synced_at), 0) AS sequence
                 FROM _school_strategies s
                 LEFT JOIN _previous_term_collections p 
@@ -259,14 +275,17 @@ impl Sqlite {
                 GROUP BY s.school_id, s.term_collection_id
                 ;
             "#,
-        )?;
+            )
+            .map_err(Error::data_store_error)?;
 
         let term_to_last_sequence = term_school_query
             .query_map((), |r| {
                 let res: ((String, String), u64) = ((r.get(0)?, r.get(1)?), r.get(2)?);
                 Ok(res)
-            })?
-            .collect::<Result<HashMap<_, _>, _>>()?;
+            })
+            .map_err(Error::data_store_error)?
+            .collect::<Result<HashMap<_, _>, _>>()
+            .map_err(Error::data_store_error)?;
 
         let mut term_sync = SelectSync::new();
         for ((school_id, term_collection_id), sequence) in term_to_last_sequence {
@@ -290,17 +309,18 @@ impl Sqlite {
 
 impl Datastore for Sqlite {
     fn execute_all_request_sync(&mut self, all_sync_response: AllSyncResult) -> Result<(), Error> {
-        let tx = self.conn.transaction()?;
+        let tx = self.conn.transaction().map_err(Error::data_store_error)?;
         tx.execute(
             r#" INSERT INTO _previous_all_collections (synced_at) 
             VALUES ($1);
         "#,
             (all_sync_response.new_latest_sync,),
-        )?;
+        )
+        .map_err(Error::data_store_error)?;
         for sync in all_sync_response.sync_data.into_iter() {
             Sqlite::execute_sync(&tx, sync)?
         }
-        tx.commit()?;
+        tx.commit().map_err(Error::data_store_error)?;
         Ok(())
     }
 
@@ -310,7 +330,7 @@ impl Datastore for Sqlite {
         select_sync_response: TermSyncResult,
     ) -> Result<(), Error> {
         let _ = select_sync_request;
-        let tx = self.conn.transaction()?;
+        let tx = self.conn.transaction().map_err(Error::data_store_error)?;
         for (school_id, entry) in &select_sync_response.new_sync_term_sequences {
             match entry {
                 sync_requests::SchoolEntry::TermToSequence(term_sequence) => {
@@ -321,7 +341,7 @@ impl Datastore for Sqlite {
                             VALUES ($1, $2, $3);
                             "#,
                             (sequence, school_id, term),
-                        )?;
+                        ).map_err(Error::data_store_error)?;
                     }
                 }
                 sync_requests::SchoolEntry::Sequence(sequence) => {
@@ -331,25 +351,26 @@ impl Datastore for Sqlite {
                         VALUES ($1, $2);
                         "#,
                         (sequence, school_id),
-                    )?;
+                    )
+                    .map_err(Error::data_store_error)?;
                 }
             }
         }
         for sync in select_sync_response.sync_data.into_iter() {
             Sqlite::execute_sync(&tx, sync)?
         }
-        tx.commit()?;
+        tx.commit().map_err(Error::data_store_error)?;
         Ok(())
     }
 
     fn generate_sync_options(&mut self) -> Result<SyncOptions, Error> {
         match (self.is_select_sync()?, self.is_all_sync()?) {
-            (true, true) => Err(SyncError::new(
+            (true, true) => Err(Error::sync_error(
                 "Dirty db state cannot be both select and all sync",
             )),
             (true, false) => Ok(SyncOptions::Select(self.get_select_request_options()?)),
             (false, true) => Ok(SyncOptions::All(self.get_all_request_options()?)),
-            (false, false) => Err(SyncError::new(
+            (false, false) => Err(Error::sync_error(
                 "Sync stratgey not set! Set the resources to sync.",
             )),
         }
@@ -359,7 +380,7 @@ impl Datastore for Sqlite {
         match resources {
             SyncResources::Everything => {
                 if self.is_select_sync()? {
-                    return Err(SyncError::new(
+                    return Err(Error::sync_error(
                         "Cannot set sync all because select syncs have already been done",
                     ));
                 }
@@ -367,50 +388,58 @@ impl Datastore for Sqlite {
                 if self.is_all_sync()? {
                     return Ok(());
                 }
-                self.conn.execute(
-                    r#"
+                self.conn
+                    .execute(
+                        r#"
                     INSERT INTO _previous_all_collections (synced_at)
                     VALUES (0);
                     "#,
-                    (),
-                )?;
+                        (),
+                    )
+                    .map_err(Error::data_store_error)?;
             }
             SyncResources::Select(select_sync_options) => {
                 if self.is_all_sync()? {
-                    return Err(SyncError::new(
+                    return Err(Error::sync_error(
                         "Cannot set sync select because sync all has already been done",
                     ));
                 }
-                let mut get_full_schools = self.conn.prepare(
-                    r#"
+                let mut get_full_schools = self
+                    .conn
+                    .prepare(
+                        r#"
                     SELECT school_id, term_collection_id
                     FROM _school_strategies
                     "#,
-                )?;
+                    )
+                    .map_err(Error::data_store_error)?;
                 let mut full_school_collections: HashSet<(String, Option<String>)> = HashSet::new();
-                let full_school_collections_rows =
-                    get_full_schools.query_map((), |r| Ok((r.get(0)?, r.get(1)?)))?;
+                let full_school_collections_rows = get_full_schools
+                    .query_map((), |r| Ok((r.get(0)?, r.get(1)?)))
+                    .map_err(Error::data_store_error)?;
                 for f in full_school_collections_rows {
-                    full_school_collections.insert(f?);
+                    full_school_collections.insert(f.map_err(Error::data_store_error)?);
                 }
 
                 for (school_id, collection_type) in select_sync_options.get_collections() {
                     match collection_type {
                         CollectionType::AllSchoolData => {
                             if !full_school_collections.contains(&(school_id.clone(), None)) {
-                                self.conn.execute(
-                                    r#"
+                                self.conn
+                                    .execute(
+                                        r#"
                                     INSERT INTO _school_strategies 
                                     (school_id, term_collection_id) 
                                     VALUES (?, NULL)
                                     "#,
-                                    [school_id],
-                                )?;
+                                        [school_id],
+                                    )
+                                    .map_err(Error::data_store_error)?;
                             }
                         }
                         CollectionType::SelectTermData(terms) => {
                             if full_school_collections.contains(&(school_id.clone(), None)) {
-                                return Err(SyncError::new(format!(
+                                return Err(Error::sync_error(format!(
                                     "Cannot do select term sync for school `{school_id}` because the whole school as been synced"
                                 )));
                             }
@@ -418,14 +447,16 @@ impl Datastore for Sqlite {
                                 if !full_school_collections
                                     .contains(&(school_id.clone(), Some(term.clone())))
                                 {
-                                    self.conn.execute(
-                                        r#"
+                                    self.conn
+                                        .execute(
+                                            r#"
                                         INSERT INTO _school_strategies 
                                         (school_id, term_collection_id) 
                                         VALUES (?, ?)
                                         "#,
-                                        [school_id, term],
-                                    )?;
+                                            [school_id, term],
+                                        )
+                                        .map_err(Error::data_store_error)?;
                                 }
                             }
                         }
@@ -456,7 +487,7 @@ fn convert_to_sql_value(v: &Value) -> Result<rusqlite::types::Value, Error> {
                 Ok(rusqlite::types::Value::Null)
             }
         }
-        _ => Err(SyncError::new(format!("Unsupported type {v:?}"))),
+        _ => Err(Error::sync_error(format!("Unsupported type {v:?}"))),
     }
 }
 
@@ -515,7 +546,10 @@ mod sync_tests {
             let updates_text = fs::read_to_string(&full_path).unwrap();
             let response: AllSyncResult = from_str(&updates_text).unwrap();
             for update in response.sync_data {
-                Sqlite::execute_sync(&tx, update).unwrap()
+                let res = Sqlite::execute_sync(&tx, update);
+                if let Err(err) = res {
+                    panic!("could not do sync {test_sync} {err}")
+                }
             }
             tx.commit().unwrap();
             info!("Finished sync: {}", test_sync);

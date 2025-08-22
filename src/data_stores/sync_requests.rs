@@ -1,4 +1,4 @@
-use crate::errors::{Error, SyncError};
+use crate::errors::Error;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -74,7 +74,7 @@ impl ClassDataSync {
             .collect();
 
         if !invalid_cols.is_empty() {
-            return Err(SyncError::new(format!(
+            return Err(Error::sync_error(format!(
                 "`{:?}` There is are invalid column(s) in relevant fields: {}",
                 self.relevant_fields,
                 invalid_cols.join(", ")
@@ -93,7 +93,7 @@ impl ClassDataSync {
             })
             .collect();
         if !invalid_cols.is_empty() {
-            return Err(SyncError::new(format!(
+            return Err(Error::sync_error(format!(
                 "`{:?}` There is an invalid column in pk fields: {}",
                 self.pk_fields,
                 invalid_cols.join(", ")
@@ -149,7 +149,7 @@ impl SelectSync {
 
     pub fn add_school_sync(&mut self, school_id: String, synced_at: u64) -> Result<(), Error> {
         if self.schools.contains_key(&school_id) {
-            return Err(SyncError::new(format!(
+            return Err(Error::sync_error(format!(
                 "school_id `{school_id}` is already set"
             )));
         }
@@ -171,13 +171,13 @@ impl SelectSync {
         match school_entry {
             SchoolEntry::TermToSequence(terms) => {
                 if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
-                    return Err(SyncError::new(format!(
+                    return Err(Error::sync_error(format!(
                         "This term already was set to sync with {old_sync}"
                     )));
                 }
             }
             SchoolEntry::Sequence(sequence) => {
-                return Err(SyncError::new(format!(
+                return Err(Error::sync_error(format!(
                     "school id already being synced with {sequence}",
                 )));
             }
@@ -193,7 +193,7 @@ impl SelectSync {
     ) -> Result<(), Error> {
         let terms = self.exclude.entry(school_id).or_default();
         if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
-            return Err(SyncError::new(format!(
+            return Err(Error::sync_error(format!(
                 "This term already was set as an exclusion with {old_sync}"
             )));
         }
