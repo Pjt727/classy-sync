@@ -1,4 +1,7 @@
 #![allow(dead_code)]
+use clap::Parser;
+use clap::Subcommand;
+use clap::command;
 use classy_sync::argument_parser::SelectSyncOptions;
 use classy_sync::argument_parser::SyncResources;
 use classy_sync::data_stores::{
@@ -7,7 +10,6 @@ use classy_sync::data_stores::{
 use dotenv::dotenv;
 use lazy_static::lazy_static;
 use reqwest::blocking::Client;
-use std::env;
 
 const SYNC_DOMAIN: &str = "http://localhost:3000";
 
@@ -34,37 +36,59 @@ impl Default for SyncConfig {
     }
 }
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+// Define the subcommands
+#[derive(Subcommand, Debug)]
+enum Commands {
+    Set { sync_instructions: String },
+    Unset { sync_instructions: String },
+}
+
 fn main() {
     dotenv().ok();
     env_logger::init();
 
     // for now just taking the first argument as
-    let args: Vec<String> = env::args().collect();
+    let cli = Cli::parse();
     let mut data_store = replicate_datastore::get_datastore().unwrap();
-    if args.len() >= 2 {
-        let sync_instructions = args.get(1).unwrap();
-        if sync_instructions == "all" {
-            data_store
-                .set_request_sync_resources(SyncResources::Everything)
-                .unwrap();
-        } else {
+    match &cli.command {
+        Some(Commands::Set { sync_instructions }) => {
+            if sync_instructions == "all" {
+                data_store
+                    .set_request_sync_resources(SyncResources::Everything)
+                    .unwrap();
+            } else {
+                let sync_options = SelectSyncOptions::from_input(sync_instructions.to_string());
+                data_store
+                    .set_request_sync_resources(SyncResources::Select(sync_options))
+                    .unwrap();
+            }
+        }
+        Some(Commands::Unset { sync_instructions }) => {
             let sync_options = SelectSyncOptions::from_input(sync_instructions.to_string());
             data_store
-                .set_request_sync_resources(SyncResources::Select(sync_options))
+                .unset_request_sync_resources(SyncResources::Select(sync_options))
                 .unwrap();
         }
+        None => {}
     }
 
-    let client = Client::new();
-    sync(client, SyncConfig::default(), &mut *data_store);
+    sync(SyncConfig::default(), &mut *data_store);
 }
 
-fn sync(client: Client, routes: SyncConfig, data_store: &mut dyn Datastore) {
+fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
+    let client = Client::new();
     let request_options = data_store.generate_sync_options().unwrap();
     match request_options {
         sync_requests::SyncOptions::All(all_sync) => {
             let response: sync_requests::AllSyncResult = client
-                .get(routes.sync_all)
+                .get(config.sync_all)
                 .query(&all_sync)
                 .send()
                 .unwrap()
@@ -75,7 +99,7 @@ fn sync(client: Client, routes: SyncConfig, data_store: &mut dyn Datastore) {
 
         sync_requests::SyncOptions::Select(select_sync) => {
             let response: sync_requests::TermSyncResult = client
-                .post(routes.sync_select)
+                .post(config.sync_select)
                 .json(&select_sync)
                 .send()
                 .unwrap()
