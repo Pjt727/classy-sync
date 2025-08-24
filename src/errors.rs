@@ -1,54 +1,37 @@
-// Error handling will be looked at more
-use std::backtrace::{Backtrace, BacktraceStatus};
-use std::fmt;
+use serde_json::Value;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[cfg(feature = "sqlite")]
+use crate::data_stores::sqlite::errors::SqliteError;
+
+#[derive(Error, Debug)]
 pub enum Error {
-    SyncError {
+    #[error("Network error: {0}")]
+    NetworkError(#[from] reqwest::Error),
+
+    #[error("Invalid input: {message}")]
+    InputParseError { message: String },
+
+    #[error("Invalid select sync addition: {message}")]
+    DuplicateSyncAddition { message: String },
+
+    #[error("Failed to parse input {0}")]
+    JsonParseError(#[from] serde_json::Error),
+
+    #[error(transparent)]
+    DataStoreError(DataStoreError),
+
+    #[error("Record with invalid schema {message}: {values}\n{record}", values=invalid_values.join(", "))]
+    InvalidSchemaValues {
         message: String,
-        backtrace: Backtrace,
-    },
-    DataStoreError {
-        message: String,
-        backtrace: Backtrace,
+        invalid_values: Vec<String>,
+        record: Value,
     },
 }
 
-impl Error {
-    /// errors in the logic of how to use the data store
-    pub fn sync_error<T: ToString>(message: T) -> Self {
-        Error::SyncError {
-            message: message.to_string(),
-            backtrace: Backtrace::capture(),
-        }
-    }
-
-    /// errors in performing actions for the datastore
-    pub fn data_store_error<T: ToString>(message: T) -> Self {
-        Error::DataStoreError {
-            message: message.to_string(),
-            backtrace: Backtrace::capture(),
-        }
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::SyncError { message, backtrace } => {
-                writeln!(f, "Sync Error: {message}")?;
-                if backtrace.status() != BacktraceStatus::Disabled {
-                    write!(f, "Backtrace:\n{backtrace}")?;
-                }
-                Ok(())
-            }
-            Error::DataStoreError { message, backtrace } => {
-                writeln!(f, "Data Store Error: {message}")?;
-                if backtrace.status() != BacktraceStatus::Disabled {
-                    write!(f, "Backtrace:\n{backtrace}")?;
-                }
-                Ok(())
-            }
-        }
-    }
+#[derive(Error, Debug)]
+pub enum DataStoreError {
+    #[error("Sqlite Error: {0}")]
+    #[cfg(feature = "sqlite")]
+    SqliteError(#[from] SqliteError),
 }

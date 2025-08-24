@@ -57,7 +57,7 @@ pub struct ClassDataSync {
 
 impl ClassDataSync {
     /// This funciton should be used to verify columns in case of sql injection
-    pub fn verify_columns(&self) -> Result<(), Error> {
+    pub fn verify_record(&self) -> Result<(), Error> {
         let is_column = Regex::new(r"\b[a-zA-Z_]\b").unwrap();
         let invalid_cols: Vec<_> = self
             .relevant_fields
@@ -74,11 +74,11 @@ impl ClassDataSync {
             .collect();
 
         if !invalid_cols.is_empty() {
-            return Err(Error::sync_error(format!(
-                "`{:?}` There is are invalid column(s) in relevant fields: {}",
-                self.relevant_fields,
-                invalid_cols.join(", ")
-            )));
+            return Err(Error::InvalidSchemaValues {
+                message: "Invalid columns".to_string(),
+                invalid_values: invalid_cols,
+                record: serde_json::to_value(self)?,
+            });
         }
 
         let invalid_cols: Vec<_> = self
@@ -93,11 +93,11 @@ impl ClassDataSync {
             })
             .collect();
         if !invalid_cols.is_empty() {
-            return Err(Error::sync_error(format!(
-                "`{:?}` There is an invalid column in pk fields: {}",
-                self.pk_fields,
-                invalid_cols.join(", ")
-            )));
+            return Err(Error::InvalidSchemaValues {
+                message: "Invalid columns".to_string(),
+                invalid_values: invalid_cols,
+                record: serde_json::to_value(self)?,
+            });
         }
 
         Ok(())
@@ -145,13 +145,13 @@ impl SelectSync {
         &self.schools
     }
 
-    // all of these setter methods are pretty picky so maybe just make they less so
+    // all of these setter methods are pretty picky so maybe just make them less so
 
     pub fn add_school_sync(&mut self, school_id: String, synced_at: u64) -> Result<(), Error> {
         if self.schools.contains_key(&school_id) {
-            return Err(Error::sync_error(format!(
-                "school_id `{school_id}` is already set"
-            )));
+            return Err(Error::DuplicateSyncAddition {
+                message: format!("school_id `{school_id}` is already set"),
+            });
         }
         self.schools
             .insert(school_id, SchoolEntry::Sequence(synced_at));
@@ -171,15 +171,15 @@ impl SelectSync {
         match school_entry {
             SchoolEntry::TermToSequence(terms) => {
                 if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
-                    return Err(Error::sync_error(format!(
-                        "This term already was set to sync with {old_sync}"
-                    )));
+                    return Err(Error::DuplicateSyncAddition {
+                        message: format!("The term `{old_sync}` already was set to sync"),
+                    });
                 }
             }
             SchoolEntry::Sequence(sequence) => {
-                return Err(Error::sync_error(format!(
-                    "school id already being synced with {sequence}",
-                )));
+                return Err(Error::DuplicateSyncAddition {
+                    message: format!("school id already being synced with {sequence}",),
+                });
             }
         };
         Ok(())
@@ -193,9 +193,9 @@ impl SelectSync {
     ) -> Result<(), Error> {
         let terms = self.exclude.entry(school_id).or_default();
         if let Some(old_sync) = terms.insert(term_collection_id, synced_at) {
-            return Err(Error::sync_error(format!(
-                "This term already was set as an exclusion with {old_sync}"
-            )));
+            return Err(Error::DuplicateSyncAddition {
+                message: format!("this term already was set as an exclusion with {old_sync}"),
+            });
         }
         Ok(())
     }

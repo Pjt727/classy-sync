@@ -8,30 +8,32 @@ use classy_sync::data_stores::{
     replicate_datastore, replicate_datastore::Datastore, sync_requests,
 };
 use dotenv::dotenv;
-use lazy_static::lazy_static;
 use reqwest::blocking::Client;
 
-const SYNC_DOMAIN: &str = "http://localhost:3000";
-
-lazy_static! {
-    static ref SYNC_ALL_ROUTE: String = format!("{}/sync/all", SYNC_DOMAIN);
-    static ref SYNC_SELECT_ROUTE: String = format!("{}/sync/schools", SYNC_DOMAIN);
-}
+const CLASSY_URI: &str = "http://localhost:3000";
 
 // TODO: eventually this file will also be responsible for
 //   - authentication?
 //   - pagination
 
 pub struct SyncConfig {
-    pub sync_all: String,
-    pub sync_select: String,
+    pub uri: String,
+}
+
+impl SyncConfig {
+    fn get_sync_all(self) -> String {
+        format!("{}/sync/all", self.uri)
+    }
+
+    fn get_sync_select(self) -> String {
+        format!("{}/sync/schools", self.uri)
+    }
 }
 
 impl Default for SyncConfig {
     fn default() -> Self {
         SyncConfig {
-            sync_all: SYNC_ALL_ROUTE.clone(),
-            sync_select: SYNC_SELECT_ROUTE.clone(),
+            uri: CLASSY_URI.to_string(),
         }
     }
 }
@@ -88,7 +90,7 @@ fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
     match request_options {
         sync_requests::SyncOptions::All(all_sync) => {
             let response: sync_requests::AllSyncResult = client
-                .get(config.sync_all)
+                .get(config.get_sync_all())
                 .query(&all_sync)
                 .send()
                 .unwrap()
@@ -99,7 +101,7 @@ fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
 
         sync_requests::SyncOptions::Select(select_sync) => {
             let response: sync_requests::TermSyncResult = client
-                .post(config.sync_select)
+                .post(config.get_sync_select())
                 .json(&select_sync)
                 .send()
                 .unwrap()
@@ -114,15 +116,29 @@ fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
 
 #[cfg(test)]
 mod sync_tests {
-    use super::*;
-    use classy_sync::data_stores::replicate_datastore::get_datastore;
-    use dotenv::dotenv;
+    use std::fs;
 
-    // TODO: add mock tests
+    use super::*;
+    use classy_sync::data_stores::{
+        replicate_datastore::get_datastore, sync_requests::AllSyncResult,
+    };
+    use serde_json::from_str;
+
+    #[cfg(feature = "sqlite")]
     #[test]
     fn full_sync() {
-        dotenv().ok();
         env_logger::init();
+        let mut server = mockito::Server::new();
+
+        let test_path = "test-syncs/maristfall2024/01.json";
+        let updates_text = fs::read_to_string(test_path).unwrap();
+        let _: AllSyncResult = from_str(&updates_text).unwrap();
+        server
+            .mock("GET", "/sync/all")
+            .with_header("content-type", "application/json")
+            .with_body(updates_text)
+            .create();
+
         let mut sqlite_datastore = get_datastore().expect("Could not get sqlite data store");
 
         sqlite_datastore
