@@ -15,6 +15,15 @@ pub enum SyncResources {
     Select(SelectSyncOptions),
 }
 
+impl SyncResources {
+    pub fn from_input(input: &str) -> SyncResources {
+        if input == "all" {
+            return SyncResources::Everything;
+        }
+        SyncResources::Select(SelectSyncOptions::from_input(input))
+    }
+}
+
 #[derive(Debug)]
 pub enum CollectionType {
     AllSchoolData,

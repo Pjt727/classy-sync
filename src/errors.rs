@@ -19,7 +19,7 @@ pub enum Error {
     JsonParseError(#[from] serde_json::Error),
 
     #[error(transparent)]
-    DataStoreError(DataStoreError),
+    DataStoreError(#[from] DataStoreError),
 
     #[error("Record with invalid schema {message}: {values}\n{record}", values=invalid_values.join(", "))]
     InvalidSchemaValues {

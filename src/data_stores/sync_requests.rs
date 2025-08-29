@@ -222,3 +222,19 @@ pub struct AllSyncResult {
     pub sync_data: Vec<ClassDataSync>,
     pub has_more: bool,
 }
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub struct Term {
+    pub id: String,
+    pub school_id: String,
+    pub year: u32,
+    pub season: String,
+    pub name: String,
+    pub still_collecting: bool,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub struct School {
+    pub id: String,
+    pub name: String,
+}

@@ -1,4 +1,7 @@
-use crate::argument_parser::SyncResources;
+use crate::{
+    argument_parser::SyncResources,
+    data_stores::sync_requests::{School, Term},
+};
 
 use super::sync_requests::{AllSyncResult, SelectSync, SyncOptions, TermSyncResult};
 use crate::errors::DataStoreError;
@@ -28,6 +31,10 @@ pub trait Datastore {
         select_sync_request: SelectSync,
         select_sync_response: TermSyncResult,
     ) -> Result<(), DataStoreError>;
+
+    fn add_schools(&mut self, schools: Vec<School>) -> Result<(), DataStoreError>;
+
+    fn add_terms(&mut self, terms: Vec<Term>) -> Result<(), DataStoreError>;
 }
 
 /// gets the datastore that is selected as per the first feature

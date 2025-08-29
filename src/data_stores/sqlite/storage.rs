@@ -554,6 +554,51 @@ impl Datastore for Sqlite {
         let _ = resources;
         todo!()
     }
+
+    fn add_schools(&mut self, schools: Vec<sync_requests::School>) -> Result<(), DataStoreError> {
+        let tx = self.conn.transaction().map_err(SqliteError::from)?;
+        for school in schools {
+            tx.execute(
+                r#"
+            INSERT INTO schools (id, name)
+            VALUES ($1, $2);
+            "#,
+                (school.id, school.name),
+            )
+            .map_err(|e| SqliteError::FailedSqliteQuery {
+                query_info: "insert schools".to_string(),
+                source: e,
+            })?;
+        }
+        tx.commit().map_err(SqliteError::from)?;
+        Ok(())
+    }
+
+    fn add_terms(&mut self, terms: Vec<sync_requests::Term>) -> Result<(), DataStoreError> {
+        let tx = self.conn.transaction().map_err(SqliteError::from)?;
+        for term in terms {
+            tx.execute(
+                r#"
+            INSERT INTO terms (id, school_id, year, season, name, still_collecting)
+            VALUES ($1, $2, $3, $4, $5, $6);
+            "#,
+                (
+                    term.id,
+                    term.school_id,
+                    term.year,
+                    term.season,
+                    term.name,
+                    term.still_collecting,
+                ),
+            )
+            .map_err(|e| SqliteError::FailedSqliteQuery {
+                query_info: "insert schools".to_string(),
+                source: e,
+            })?;
+        }
+        tx.commit().map_err(SqliteError::from)?;
+        Ok(())
+    }
 }
 
 // This helper function also needs to return SqliteError

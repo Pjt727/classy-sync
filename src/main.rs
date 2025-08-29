@@ -2,12 +2,12 @@
 use clap::Parser;
 use clap::Subcommand;
 use clap::command;
-use classy_sync::argument_parser::SelectSyncOptions;
 use classy_sync::argument_parser::SyncResources;
+use classy_sync::data_stores::sync_requests::School;
 use classy_sync::data_stores::{
     replicate_datastore, replicate_datastore::Datastore, sync_requests,
 };
-use classy_sync::errors::DataStoreError;
+use classy_sync::errors::{DataStoreError, Error};
 use dotenv::dotenv;
 use reqwest::blocking::Client;
 
@@ -22,12 +22,20 @@ pub struct SyncConfig {
 }
 
 impl SyncConfig {
-    fn get_sync_all(self) -> String {
+    fn get_sync_all(&self) -> String {
         format!("{}/sync/all", self.uri)
     }
 
-    fn get_sync_select(self) -> String {
+    fn get_sync_select(&self) -> String {
         format!("{}/sync/schools", self.uri)
+    }
+
+    fn get_schools(&self) -> String {
+        format!("{}/get", self.uri)
+    }
+
+    fn get_terms(&self, school: &str) -> String {
+        format!("{}/get/{school}", self.uri)
     }
 }
 
@@ -46,38 +54,54 @@ struct Cli {
     command: Option<Commands>,
 }
 
+#[derive(Subcommand, Debug)]
+enum AddCommands {
+    Schools,
+    Terms { school_names: String },
+}
+
 // Define the subcommands
 #[derive(Subcommand, Debug)]
 enum Commands {
-    Set { sync_instructions: String },
-    Unset { sync_instructions: String },
+    Set {
+        sync_instructions: String,
+    },
+    Unset {
+        sync_instructions: String,
+    },
+    #[command(subcommand)]
+    Add(AddCommands),
 }
 
 fn main() {
     dotenv().ok();
     env_logger::init();
-
-    // for now just taking the first argument as
     let cli = Cli::parse();
     let mut data_store = replicate_datastore::get_datastore().unwrap();
     match &cli.command {
         Some(Commands::Set { sync_instructions }) => {
-            if sync_instructions == "all" {
-                data_store
-                    .set_request_sync_resources(SyncResources::Everything)
-                    .unwrap();
-            } else {
-                let sync_options = SelectSyncOptions::from_input(sync_instructions);
-                data_store
-                    .set_request_sync_resources(SyncResources::Select(sync_options))
-                    .unwrap();
-            }
+            let sync_options = SyncResources::from_input(sync_instructions);
+            data_store.set_request_sync_resources(sync_options).unwrap();
         }
         Some(Commands::Unset { sync_instructions }) => {
-            let sync_options = SelectSyncOptions::from_input(sync_instructions);
+            let sync_options = SyncResources::from_input(sync_instructions);
             data_store
-                .unset_request_sync_resources(SyncResources::Select(sync_options))
+                .unset_request_sync_resources(sync_options)
                 .unwrap();
+        }
+        Some(Commands::Add(flush_command)) => {
+            match flush_command {
+                AddCommands::Schools => {
+                    add_schools(SyncConfig::default(), &mut *data_store)
+                        .expect("Failed to add schools");
+                }
+                AddCommands::Terms { school_names } => {
+                    let schools: Vec<String> =
+                        school_names.split(",").map(|s| s.to_string()).collect();
+                    todo!();
+                }
+            }
+            return;
         }
         None => {}
     }
@@ -85,7 +109,14 @@ fn main() {
     sync(SyncConfig::default(), &mut *data_store).expect("Failed to sync");
 }
 
-pub fn sync(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), DataStoreError> {
+pub fn add_schools(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), Error> {
+    let client = Client::new();
+    let response: Vec<sync_requests::School> = client.get(config.get_schools()).send()?.json()?;
+
+    Ok(())
+}
+
+pub fn sync(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), Error> {
     let client = Client::new();
     let request_options = data_store.generate_sync_options().unwrap();
     match request_options {
@@ -93,10 +124,8 @@ pub fn sync(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), Da
             let response: sync_requests::AllSyncResult = client
                 .get(config.get_sync_all())
                 .query(&all_sync)
-                .send()
-                .unwrap()
-                .json()
-                .unwrap();
+                .send()?
+                .json()?;
             data_store.execute_all_request_sync(response)?;
         }
 
@@ -104,10 +133,8 @@ pub fn sync(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), Da
             let response: sync_requests::TermSyncResult = client
                 .post(config.get_sync_select())
                 .json(&select_sync)
-                .send()
-                .unwrap()
-                .json()
-                .unwrap();
+                .send()?
+                .json()?;
             data_store.execute_select_request_sync(select_sync, response)?;
         }
     }
@@ -211,9 +238,7 @@ mod sync_tests {
         let mut sqlite_datastore = get_datastore().expect("Could not get sqlite data store");
 
         sqlite_datastore
-            .set_request_sync_resources(SyncResources::Select(SelectSyncOptions::from_input(
-                "marist,202440",
-            )))
+            .set_request_sync_resources(SyncResources::from_input("marist,202440"))
             .unwrap();
         let expected_sync_options: SelectSync = serde_json::from_str(
             r#"
@@ -239,9 +264,7 @@ mod sync_tests {
         }
         sync(SyncConfig { uri: server.url() }, &mut *sqlite_datastore).expect("Sync failed");
         sqlite_datastore
-            .set_request_sync_resources(SyncResources::Select(SelectSyncOptions::from_input(
-                "marist,202540",
-            )))
+            .set_request_sync_resources(SyncResources::from_input("marist,202540"))
             .unwrap();
 
         let expected_sync_options: SelectSync = serde_json::from_str(
