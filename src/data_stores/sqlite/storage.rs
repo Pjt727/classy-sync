@@ -24,6 +24,7 @@ pub struct Sqlite {
 pub struct SqliteConfig {
     pub db_path: Option<String>,
     pub is_strict: bool,
+    pub max_records_for_syncs: u16,
 }
 
 impl Default for SqliteConfig {
@@ -31,6 +32,7 @@ impl Default for SqliteConfig {
         Self {
             db_path: None,
             is_strict: true,
+            max_records_for_syncs: DEFAULT_MAX_RECORDS,
         }
     }
 }

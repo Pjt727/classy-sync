@@ -11,7 +11,8 @@ CREATE TABLE term_collections (
     season TEXT NOT NULL CHECK( season IN ('Spring', 'Fall', 'Winter', 'Summer') ),
     name TEXT,
     still_collecting INTEGER NOT NULL CHECK(still_collecting IN (0, 1)),
-    FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
+    -- this foreign key constraint is not enforced becasue of term collection 
+    -- FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
     PRIMARY KEY (id, school_id)
 );
 
@@ -24,7 +25,8 @@ CREATE TABLE professors (
     first_name TEXT,
     last_name TEXT,
     other TEXT,
-    FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
+    -- this foreign key constraint is not enforced becasue of term collection 
+    -- FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
     PRIMARY KEY (id, school_id),
     CHECK(other IS NULL OR json_valid(other))
 );
@@ -43,7 +45,8 @@ CREATE TABLE courses (
     corequisites TEXT,
     other TEXT,
 
-    FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
+    -- this foreign key constraint is not enforced becasue of term collection 
+    -- FOREIGN KEY (school_id) REFERENCES schools(id) DEFERRABLE INITIALLY DEFERRED,
     PRIMARY KEY (school_id, subject_code, number),
     CHECK(other IS NULL OR json_valid(other))
 );
@@ -65,7 +68,8 @@ CREATE TABLE sections (
     FOREIGN KEY (school_id, subject_code, course_number)
         REFERENCES courses(school_id, subject_code, number) DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (primary_professor_id, school_id) REFERENCES professors(id, school_id) DEFERRABLE INITIALLY DEFERRED,
-    FOREIGN KEY (term_collection_id, school_id) REFERENCES term_collections(id, school_id) DEFERRABLE INITIALLY DEFERRED,
+    -- for select terms
+    -- FOREIGN KEY (term_collection_id, school_id) REFERENCES term_collections(id, school_id) DEFERRABLE INITIALLY DEFERRED,
     PRIMARY KEY (sequence, term_collection_id, subject_code, course_number, school_id),
     CHECK(other IS NULL OR json_valid(other))
 );

@@ -47,6 +47,7 @@ pub fn get_datastore() -> Result<Box<dyn Datastore>, DataStoreError> {
             db_path,
             // TODO: add this to config
             is_strict: false,
+            ..Default::default()
         };
 
         return Ok(Box::new(super::sqlite::Sqlite::new(config)?));

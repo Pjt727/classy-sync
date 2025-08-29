@@ -104,21 +104,21 @@ impl ClassDataSync {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum SyncOptions {
     All(AllSync),
     Select(SelectSync),
 }
 
 // TERM SYNCS - for getting information about specfic terms from classy
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum SchoolEntry {
     TermToSequence(HashMap<String, u64>),
     Sequence(u64),
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
 pub struct SelectSync {
     exclude: HashMap<String, HashMap<String, u64>>,
     max_records_per_request: Option<u16>,
@@ -205,11 +205,12 @@ impl SelectSync {
 pub struct TermSyncResult {
     pub new_sync_term_sequences: HashMap<String, SchoolEntry>,
     pub sync_data: Vec<ClassDataSync>,
+    pub any_has_more: bool,
 }
 
 // ALL SYNCS - for getting all information from class
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct AllSync {
     pub last_sync: u64,
     pub max_records_count: Option<u16>,
@@ -219,4 +220,5 @@ pub struct AllSync {
 pub struct AllSyncResult {
     pub new_latest_sync: u64,
     pub sync_data: Vec<ClassDataSync>,
+    pub has_more: bool,
 }

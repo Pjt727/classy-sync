@@ -7,6 +7,7 @@ use classy_sync::argument_parser::SyncResources;
 use classy_sync::data_stores::{
     replicate_datastore, replicate_datastore::Datastore, sync_requests,
 };
+use classy_sync::errors::DataStoreError;
 use dotenv::dotenv;
 use reqwest::blocking::Client;
 
@@ -66,14 +67,14 @@ fn main() {
                     .set_request_sync_resources(SyncResources::Everything)
                     .unwrap();
             } else {
-                let sync_options = SelectSyncOptions::from_input(sync_instructions.to_string());
+                let sync_options = SelectSyncOptions::from_input(sync_instructions);
                 data_store
                     .set_request_sync_resources(SyncResources::Select(sync_options))
                     .unwrap();
             }
         }
         Some(Commands::Unset { sync_instructions }) => {
-            let sync_options = SelectSyncOptions::from_input(sync_instructions.to_string());
+            let sync_options = SelectSyncOptions::from_input(sync_instructions);
             data_store
                 .unset_request_sync_resources(SyncResources::Select(sync_options))
                 .unwrap();
@@ -81,10 +82,10 @@ fn main() {
         None => {}
     }
 
-    sync(SyncConfig::default(), &mut *data_store);
+    sync(SyncConfig::default(), &mut *data_store).expect("Failed to sync");
 }
 
-fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
+pub fn sync(config: SyncConfig, data_store: &mut dyn Datastore) -> Result<(), DataStoreError> {
     let client = Client::new();
     let request_options = data_store.generate_sync_options().unwrap();
     match request_options {
@@ -96,7 +97,7 @@ fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
                 .unwrap()
                 .json()
                 .unwrap();
-            data_store.execute_all_request_sync(response).unwrap()
+            data_store.execute_all_request_sync(response)?;
         }
 
         sync_requests::SyncOptions::Select(select_sync) => {
@@ -107,11 +108,10 @@ fn sync(config: SyncConfig, data_store: &mut dyn Datastore) {
                 .unwrap()
                 .json()
                 .unwrap();
-            data_store
-                .execute_select_request_sync(select_sync, response)
-                .unwrap()
+            data_store.execute_select_request_sync(select_sync, response)?;
         }
     }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -120,21 +120,37 @@ mod sync_tests {
 
     use super::*;
     use classy_sync::data_stores::{
-        replicate_datastore::get_datastore, sync_requests::AllSyncResult,
+        replicate_datastore::get_datastore,
+        sync_requests::{AllSyncResult, SelectSync, SyncOptions, TermSyncResult},
     };
     use serde_json::from_str;
 
-    #[cfg(feature = "sqlite")]
+    fn load_all_sync_data(path: &str) -> String {
+        let updates_text = fs::read_to_string(path).expect("Could not access test json");
+        let _: AllSyncResult = from_str(&updates_text)
+            .expect("Test json is not the correct shape for all sync result");
+        updates_text
+    }
+
+    fn load_select_sync_data(path: &str) -> String {
+        let updates_text = fs::read_to_string(path).expect("Could not access test json");
+        let _: TermSyncResult = from_str(&updates_text)
+            .expect("Test json is not the correct shape for term sync result");
+        updates_text
+    }
+
     #[test]
-    fn full_sync() {
-        env_logger::init();
+    #[cfg(feature = "sqlite")]
+    fn sqlite_full_sync() {
         let mut server = mockito::Server::new();
 
-        let test_path = "test-syncs/maristfall2024/01.json";
-        let updates_text = fs::read_to_string(test_path).unwrap();
-        let _: AllSyncResult = from_str(&updates_text).unwrap();
+        let updates_text = load_all_sync_data("test-syncs/maristfall2024/01.json");
         server
             .mock("GET", "/sync/all")
+            .match_query(mockito::Matcher::UrlEncoded(
+                "last_sync".to_string(),
+                "0".to_string(),
+            ))
             .with_header("content-type", "application/json")
             .with_body(updates_text)
             .create();
@@ -143,6 +159,114 @@ mod sync_tests {
 
         sqlite_datastore
             .set_request_sync_resources(SyncResources::Everything)
-            .unwrap()
+            .unwrap();
+        match sqlite_datastore.generate_sync_options().unwrap() {
+            SyncOptions::All(all_sync) => {
+                assert_eq!(all_sync.last_sync, 0, "Expected sequence 0");
+            }
+            SyncOptions::Select(_) => panic!("Expected all sync"),
+        }
+        sync(SyncConfig { uri: server.url() }, &mut *sqlite_datastore).expect("Sync failed");
+        match sqlite_datastore.generate_sync_options().unwrap() {
+            SyncOptions::All(all_sync) => {
+                assert_eq!(all_sync.last_sync, 6303, "Expected sequence 6303")
+            }
+            SyncOptions::Select(_) => panic!("Expected all sync"),
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "sqlite")]
+    fn sqlite_term_sync() {
+        let mut server = mockito::Server::new();
+        // first call with a single term
+        let mut select_sync = SelectSync::new();
+        select_sync
+            .add_term_sync("marist".to_string(), "202440".to_string(), 0)
+            .unwrap();
+
+        server
+            .mock("POST", "/sync/schools")
+            .match_body(serde_json::to_string(&select_sync).unwrap().as_str())
+            .with_header("content-type", "application/json")
+            .with_body(load_select_sync_data("test-syncs/maristterms/202440.json"))
+            .create();
+
+        // second call with the other term
+        let mut select_sync = SelectSync::new();
+        select_sync
+            .add_term_sync("marist".to_string(), "202440".to_string(), 6929)
+            .unwrap();
+        select_sync
+            .add_term_sync("marist".to_string(), "202540".to_string(), 0)
+            .unwrap();
+
+        server
+            .mock("POST", "/sync/schools")
+            .match_body(serde_json::to_string(&select_sync).unwrap().as_str())
+            .with_header("content-type", "application/json")
+            .with_body(load_select_sync_data("test-syncs/maristterms/202540.json"))
+            .create();
+
+        let mut sqlite_datastore = get_datastore().expect("Could not get sqlite data store");
+
+        sqlite_datastore
+            .set_request_sync_resources(SyncResources::Select(SelectSyncOptions::from_input(
+                "marist,202440",
+            )))
+            .unwrap();
+        let expected_sync_options: SelectSync = serde_json::from_str(
+            r#"
+            {
+              "exclude": {},
+              "max_records_per_request": 10000,
+              "schools": {
+                "marist": {
+                  "202440": 0
+                }
+              }
+            }
+            "#,
+        )
+        .unwrap();
+        match sqlite_datastore.generate_sync_options().unwrap() {
+            SyncOptions::All(_) => {
+                panic!("Expected select sync")
+            }
+            SyncOptions::Select(options) => {
+                assert_eq!(options, expected_sync_options)
+            }
+        }
+        sync(SyncConfig { uri: server.url() }, &mut *sqlite_datastore).expect("Sync failed");
+        sqlite_datastore
+            .set_request_sync_resources(SyncResources::Select(SelectSyncOptions::from_input(
+                "marist,202540",
+            )))
+            .unwrap();
+
+        let expected_sync_options: SelectSync = serde_json::from_str(
+            r#"
+            {
+              "exclude": {},
+              "max_records_per_request": 10000,
+              "schools": {
+                "marist": {
+                  "202440": 6929,
+                  "202540": 0
+                }
+              }
+            }
+            "#,
+        )
+        .unwrap();
+        match sqlite_datastore.generate_sync_options().unwrap() {
+            SyncOptions::All(_) => {
+                panic!("Expected select sync")
+            }
+            SyncOptions::Select(options) => {
+                assert_eq!(options, expected_sync_options)
+            }
+        }
+        sync(SyncConfig { uri: server.url() }, &mut *sqlite_datastore).expect("Sync failed");
     }
 }
